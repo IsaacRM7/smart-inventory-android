@@ -10,6 +10,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Smartinventoryandroid">
         <activity
+            android:name=".ui.activities.Count"
+            android:exported="false" />
+        <activity
+            android:name=".ui.activities.Bodega"
+            android:exported="false" />
+        <activity
             android:name=".ui.activities.Login"
             android:exported="true">
             <intent-filter>

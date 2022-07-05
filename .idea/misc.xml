@@ -3,7 +3,12 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Users/igome/StudioProjects/smartinventoryandroid/app/src/main/res/layout/activity_login.xml" value="0.2115036231884058" />
+        <entry key="..\:/Users/igome/StudioProjects/smart-inventory-android/app/src/main/res/drawable/material_shape.xml" value="0.2565" />
+        <entry key="..\:/Users/igome/StudioProjects/smart-inventory-android/app/src/main/res/drawable/ripple_effect_gray.xml" value="0.2565" />
+        <entry key="..\:/Users/igome/StudioProjects/smart-inventory-android/app/src/main/res/drawable/ripple_effect_red.xml" value="0.2565" />
+        <entry key="..\:/Users/igome/StudioProjects/smart-inventory-android/app/src/main/res/drawable/ripple_effect_yellow.xml" value="0.2565" />
+        <entry key="..\:/Users/igome/StudioProjects/smart-inventory-android/app/src/main/res/layout/activity_bodega.xml" value="0.18802083333333333" />
+        <entry key="..\:/Users/igome/StudioProjects/smart-inventory-android/app/src/main/res/layout/activity_count.xml" value="0.358695652173913" />
         <entry key="..\:/Users/igome/StudioProjects/smartinventoryandroid/app/src/main/res/layout/activity_main.xml" value="0.18802083333333333" />
       </map>
     </option>

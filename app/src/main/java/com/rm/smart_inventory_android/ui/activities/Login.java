@@ -2,6 +2,7 @@ package com.rm.smart_inventory_android.ui.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -62,7 +63,9 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        logIn();
+        //logIn();
+        Intent intent = new Intent(Login.this, Count.class);
+        startActivity(intent);
     }
 
 
