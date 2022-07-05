@@ -4,12 +4,25 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.rm.smart_inventory_android.R;
+import com.rm.smart_inventory_android.io.Preferences;
+import com.rm.smart_inventory_android.io.adapters.ApiRest;
+import com.rm.smart_inventory_android.io.adapters.Service;
+import com.rm.smart_inventory_android.io.models.login.UserData;
+import com.rm.smart_inventory_android.io.models.login.UserRoot;
+
+import java.util.HashMap;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class Login extends AppCompatActivity implements View.OnClickListener {
 
@@ -39,6 +52,55 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         if(!validateForm(user, password)){
             return;
         }
+
+        sendLoginData(user, password);
+    }
+
+    private void sendLoginData(String user, String password){
+        Service service = ApiRest.getApi().create(Service.class);
+
+        HashMap<String, String> params = new HashMap<>();
+        params.put("user", user);
+        params.put("password", password);
+
+        Call<UserRoot> userCall = service.login(params);
+
+        userCall.enqueue(new Callback<UserRoot>() {
+            @Override
+            public void onResponse(Call<UserRoot> call, Response<UserRoot> response) {
+                if(response.isSuccessful()){
+                    assert response.body() != null;
+                    boolean result = response.body().getResult();
+                    String message = response.body().getMessage();
+
+                    if(result){
+                        String token = response.body().getToken();
+                        String userName = response.body().getData().get(0).getUser();
+                        int id = response.body().getData().get(0).getId();
+                        int idCount = response.body().getData().get(0).getIdCountAssigned();
+
+                        Preferences.save(Login.this, "user", userName);
+                        Preferences.save(Login.this, "password", password);
+                        Preferences.save(Login.this, "token", token);
+                        Preferences.save(Login.this, "idUser", String.valueOf(id));
+                        Preferences.save(Login.this, "id_count_assigned", String.valueOf(idCount));
+
+                        Toast.makeText(Login.this, message, Toast.LENGTH_SHORT).show();
+
+                        Intent intent = new Intent(Login.this, Bodega.class);
+                        startActivity(intent);
+                    }
+                    else{
+                        Toast.makeText(Login.this, message, Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserRoot> call, Throwable t) {
+                System.out.println("Error perrón: "+t.getMessage());
+            }
+        });
     }
 
     private boolean validateForm(String user, String password) {
@@ -63,9 +125,9 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
     @Override
     public void onClick(View view) {
-        //logIn();
-        Intent intent = new Intent(Login.this, Count.class);
-        startActivity(intent);
+        logIn();
+        //Intent intent = new Intent(Login.this, Count.class);
+        //startActivity(intent);
     }
 
 

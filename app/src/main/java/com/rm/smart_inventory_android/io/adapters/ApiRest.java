@@ -16,7 +16,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiRest {
 
-    public static final String BASE_URL = "http://52.91.223.133/smartinventory-backend-laravel/public/api";
+    public static final String BASE_URL = "http://52.91.223.133/smartinventory-backend-laravel/public/api/";
     public static String TOKEN = "";
     private static Retrofit retrofit = null;
 
