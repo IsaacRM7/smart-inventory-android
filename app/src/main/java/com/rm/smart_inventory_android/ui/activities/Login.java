@@ -80,13 +80,14 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                         Preferences.save(Login.this, "user", userName);
                         Preferences.save(Login.this, "password", password);
                         Preferences.save(Login.this, "token", token);
-                        Preferences.save(Login.this, "idUser", String.valueOf(id));
+                        Preferences.save(Login.this, "user_id", String.valueOf(id));
                         Preferences.save(Login.this, "id_count_assigned", String.valueOf(idCount));
 
                         Toast.makeText(Login.this, message, Toast.LENGTH_SHORT).show();
 
                         Intent intent = new Intent(Login.this, Center.class);
                         startActivity(intent);
+                        finish();
                     }
                     else{
                         Toast.makeText(Login.this, message, Toast.LENGTH_SHORT).show();

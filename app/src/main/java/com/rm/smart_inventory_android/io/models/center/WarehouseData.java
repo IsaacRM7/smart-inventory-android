@@ -1,4 +1,4 @@
-package com.rm.smart_inventory_android.io.models.bodega;
+package com.rm.smart_inventory_android.io.models.center;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;

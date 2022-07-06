@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.rm.smart_inventory_android.R;
 import com.rm.smart_inventory_android.io.Preferences;
-import com.rm.smart_inventory_android.io.models.bodega.WarehouseData;
+import com.rm.smart_inventory_android.io.models.center.WarehouseData;
 import com.rm.smart_inventory_android.ui.activities.Inventory;
 
 import java.util.List;
@@ -43,7 +43,7 @@ public class CenterChildrenAdapter extends RecyclerView.Adapter<CenterChildrenAd
         holder.warehouseName.setText(warehouseData.getName());
         holder.code.setText(warehouseData.getCode());
         holder.linearLayout.setOnClickListener(v -> {
-            Preferences.save((Activity) context, "warehouseId", holder.warehouseId.getText().toString());
+            Preferences.save((Activity) context, "warehouse_id", holder.warehouseId.getText().toString());
             Intent intent = new Intent(context, Inventory.class);
             context.startActivity(intent);
             ((Activity)context).finish();

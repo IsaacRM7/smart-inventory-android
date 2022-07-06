@@ -1,7 +1,6 @@
 package com.rm.smart_inventory_android.ui.adapters;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +14,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.rm.smart_inventory_android.R;
-import com.rm.smart_inventory_android.io.models.bodega.CenterData;
-import com.rm.smart_inventory_android.io.models.bodega.WarehouseData;
+import com.rm.smart_inventory_android.io.models.center.CenterData;
+import com.rm.smart_inventory_android.io.models.center.WarehouseData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,9 +59,6 @@ public class CenterAdapter extends RecyclerView.Adapter<CenterAdapter.ViewHolder
         holder.recyclerView.setLayoutManager(new LinearLayoutManager(holder.itemView.getContext()));
         holder.recyclerView.setHasFixedSize(true);
         holder.recyclerView.setAdapter(adapter);
-        if(centerData.getCount() == 1){
-            holder.linearLayout.setBackgroundColor(Color.parseColor("#868B8E"));
-        }
         holder.linearLayout.setOnClickListener(v -> {
             centerData.setExpandable(!centerData.isExpandable());
             list = centerData.getWarehouses();

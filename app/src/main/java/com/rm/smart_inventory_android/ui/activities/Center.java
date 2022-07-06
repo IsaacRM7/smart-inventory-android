@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.Toast;
 
@@ -12,9 +11,9 @@ import com.rm.smart_inventory_android.R;
 import com.rm.smart_inventory_android.io.Preferences;
 import com.rm.smart_inventory_android.io.adapters.ApiRest;
 import com.rm.smart_inventory_android.io.adapters.Service;
-import com.rm.smart_inventory_android.io.models.bodega.CenterData;
-import com.rm.smart_inventory_android.io.models.bodega.CenterRoot;
-import com.rm.smart_inventory_android.io.models.bodega.WarehouseData;
+import com.rm.smart_inventory_android.io.models.center.CenterData;
+import com.rm.smart_inventory_android.io.models.center.CenterRoot;
+import com.rm.smart_inventory_android.io.models.center.WarehouseData;
 import com.rm.smart_inventory_android.ui.adapters.CenterAdapter;
 
 import java.util.ArrayList;
@@ -36,10 +35,6 @@ public class Center extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_center);
 
-        System.out.println("CACAñ: "+ Preferences.get(this, "token"));
-        System.out.println("CACAñ: "+ Preferences.get(this, "idUser"));
-        System.out.println("CACAñ: "+ Preferences.get(this, "id_count_assigned"));
-
         warehouseDataList = new ArrayList<>();
 
         centerRecyclerview = findViewById(R.id.warehouse_recycler);
@@ -54,14 +49,14 @@ public class Center extends AppCompatActivity {
 
         String token = Preferences.get(Center.this, "token");
         String idCount = Preferences.get(Center.this, "id_count_assigned");
-        String idUser = Preferences.get(Center.this, "idUser");
+        String idUser = Preferences.get(Center.this, "user_id");
 
         HashMap<String, String> params = new HashMap<>();
         params.put("id_count_assigned", idCount);
         params.put("user_id", idUser);
         ApiRest.TOKEN = token;
 
-        Call<CenterRoot> centerRootCall = service.postBodegas(params);
+        Call<CenterRoot> centerRootCall = service.getCenters(params);
         centerRootCall.enqueue(new Callback<CenterRoot>() {
             @Override
             public void onResponse(Call<CenterRoot> call, Response<CenterRoot> response) {
@@ -85,7 +80,6 @@ public class Center extends AppCompatActivity {
 
                                 items.add(new WarehouseData(warehouseId, code, warehouseName));
                             }
-                            System.out.println("CONTTTTT: "+centerDataList.get(i).getCount());
 
                             if(centerDataList.get(i).getCount() == 1){
                                 warehouseDataList.add(new CenterData(centerId, centerName+" ("+centercode+") - ✔", items));
