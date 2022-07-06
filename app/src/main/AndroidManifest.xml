@@ -20,7 +20,7 @@
             android:name=".ui.activities.Count"
             android:exported="false" />
         <activity
-            android:name=".ui.activities.Bodega"
+            android:name=".ui.activities.Center"
             android:exported="false" />
         <activity
             android:name=".ui.activities.Login"

@@ -66,12 +66,12 @@
     <string name="material_name">NOMBRE MATERIAL</string>
     <string name="zero">0</string>
     <string name="due_date">Fecha de vencimiento</string>
-    <string name="agencyid">ID Agencia</string>
-    <string name="agency_name">Nombre Agencia</string>
+    <string name="center_id">ID Centro</string>
+    <string name="center_name">Nombre Centro</string>
     <string name="credentials">Credenciales incorrectas.</string>
-    <string name="bodegaid">ID bodega</string>
-    <string name="bodega_name">Bodega Nombre</string>
-    <string name="bodega_location">Ubicación Bodega</string>
+    <string name="warehouse_id">ID almacén</string>
+    <string name="warehouse_name">almacen Nombre</string>
+    <string name="warehouse_location">Ubicación almacén</string>
     <string name="icon_description">icono</string>
     <string name="arrowdown">arrowdown</string>
     <string name="title_activity_logout_menu">LogoutMenu</string>

@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -15,7 +14,6 @@ import com.rm.smart_inventory_android.R;
 import com.rm.smart_inventory_android.io.Preferences;
 import com.rm.smart_inventory_android.io.adapters.ApiRest;
 import com.rm.smart_inventory_android.io.adapters.Service;
-import com.rm.smart_inventory_android.io.models.login.UserData;
 import com.rm.smart_inventory_android.io.models.login.UserRoot;
 
 import java.util.HashMap;
@@ -87,7 +85,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
                         Toast.makeText(Login.this, message, Toast.LENGTH_SHORT).show();
 
-                        Intent intent = new Intent(Login.this, Bodega.class);
+                        Intent intent = new Intent(Login.this, Center.class);
                         startActivity(intent);
                     }
                     else{
