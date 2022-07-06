@@ -1,9 +1,11 @@
 package com.rm.smart_inventory_android.ui.activities;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
@@ -16,6 +18,7 @@ import com.rm.smart_inventory_android.io.adapters.ApiRest;
 import com.rm.smart_inventory_android.io.adapters.Service;
 import com.rm.smart_inventory_android.io.models.inventory.InventoryData;
 import com.rm.smart_inventory_android.io.models.inventory.InventoryRoot;
+import com.rm.smart_inventory_android.io.models.login.UserRoot;
 import com.rm.smart_inventory_android.ui.adapters.InventoryAdapter;
 
 import java.util.ArrayList;
@@ -31,7 +34,6 @@ public class Inventory extends AppCompatActivity implements ClickListener {
     private InventoryAdapter inventoryAdapter;
     private ArrayList<InventoryData> inventoryDataArrayList;
     private List<InventoryData> inventoryDataList;
-    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +42,7 @@ public class Inventory extends AppCompatActivity implements ClickListener {
 
         LinearLayoutManager linearLayout = new LinearLayoutManager(this);
 
-        recyclerView = findViewById(R.id.sku_recycler);
+        RecyclerView recyclerView = findViewById(R.id.sku_recycler);
         inventoryAdapter = new InventoryAdapter(this, this);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(linearLayout);
@@ -54,6 +56,20 @@ public class Inventory extends AppCompatActivity implements ClickListener {
 
             switch(id){
                 case R.id.logout:
+                    DialogInterface.OnClickListener dialogClickListener = (dialog, which) -> {
+                        switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+                                logout();
+                                break;
+
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                break;
+                        }
+                    };
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(Inventory.this);
+                    builder.setMessage("¿Desea cerrar sesión?").setPositiveButton("Sí", dialogClickListener)
+                            .setNegativeButton("No", dialogClickListener).show();
                     return false;
 
                 case R.id.sync:
@@ -67,6 +83,40 @@ public class Inventory extends AppCompatActivity implements ClickListener {
         });
 
         getInventory();
+    }
+
+    private void logout(){
+        Service service = ApiRest.getInterceptedApi().create(Service.class);
+        String idUser = Preferences.get(Inventory.this, "user_id");
+        Call<UserRoot> userRootCall = service.logout(idUser);
+        System.out.println("AAAA: "+ApiRest.TOKEN);
+        System.out.println("AAAA: "+Preferences.get(Inventory.this, "user_id"));
+
+        userRootCall.enqueue(new Callback<UserRoot>() {
+            @Override
+            public void onResponse(Call<UserRoot> call, Response<UserRoot> response) {
+
+                if(response.isSuccessful()) {
+                    assert response.body() != null;
+                    String message = response.body().getMessage();
+                    Preferences.delete(Inventory.this, "user_id");
+                    Preferences.delete(Inventory.this, "user");
+                    Preferences.delete(Inventory.this, "password");
+                    Preferences.delete(Inventory.this, "id_count_assigned");
+                    Preferences.delete(Inventory.this, "token");
+                    Preferences.delete(Inventory.this, "warehouse_id");
+                    Toast.makeText(Inventory.this, message, Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(Inventory.this, Login.class);
+                    startActivity(intent);
+                    finish();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserRoot> call, Throwable t) {
+
+            }
+        });
     }
 
     private void getInventory(){
