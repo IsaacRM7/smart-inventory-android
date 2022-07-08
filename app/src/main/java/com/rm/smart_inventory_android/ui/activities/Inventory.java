@@ -19,6 +19,7 @@ import com.rm.smart_inventory_android.io.adapters.Service;
 import com.rm.smart_inventory_android.io.models.inventory.InventoryData;
 import com.rm.smart_inventory_android.io.models.inventory.InventoryRoot;
 import com.rm.smart_inventory_android.io.models.login.UserRoot;
+import com.rm.smart_inventory_android.io.models.state.StateRoot;
 import com.rm.smart_inventory_android.ui.adapters.InventoryAdapter;
 
 import java.util.ArrayList;
@@ -83,14 +84,13 @@ public class Inventory extends AppCompatActivity implements ClickListener {
         });
 
         getInventory();
+        getStates();
     }
 
     private void logout(){
         Service service = ApiRest.getInterceptedApi().create(Service.class);
         String idUser = Preferences.get(Inventory.this, "user_id");
         Call<UserRoot> userRootCall = service.logout(idUser);
-        System.out.println("AAAA: "+ApiRest.TOKEN);
-        System.out.println("AAAA: "+Preferences.get(Inventory.this, "user_id"));
 
         userRootCall.enqueue(new Callback<UserRoot>() {
             @Override
@@ -114,6 +114,35 @@ public class Inventory extends AppCompatActivity implements ClickListener {
 
             @Override
             public void onFailure(Call<UserRoot> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private void getStates(){
+        Service service = ApiRest.getInterceptedApi().create(Service.class);
+        Call<StateRoot> stateRootCall = service.getStates();
+        stateRootCall.enqueue(new Callback<StateRoot>() {
+            @Override
+            public void onResponse(Call<StateRoot> call, Response<StateRoot> response) {
+
+                if(response.isSuccessful()){
+                    StateRoot stateRoot = response.body();
+                    List<String> stateList = new ArrayList<>();
+                    List<Integer> stateIdList = new ArrayList<>();
+
+                    for(int i=0;i<stateRoot.getData().size();i++){
+                        stateList.add(stateRoot.getData().get(i).getState());
+                        stateIdList.add(stateRoot.getData().get(i).getId());
+                    }
+
+                    Preferences.saveIntList(Inventory.this, "stateIdList", stateIdList);
+                    Preferences.saveList(Inventory.this, "stateList", stateList);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<StateRoot> call, Throwable t) {
 
             }
         });
@@ -161,7 +190,7 @@ public class Inventory extends AppCompatActivity implements ClickListener {
                         }
                     }
                 }catch (Exception ex){
-                    System.out.println("ERRORR: "+ex);
+                    System.out.println("ERROR: "+ex);
                 }
             }
 

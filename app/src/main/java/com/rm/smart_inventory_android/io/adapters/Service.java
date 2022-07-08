@@ -3,6 +3,7 @@ package com.rm.smart_inventory_android.io.adapters;
 import com.rm.smart_inventory_android.io.models.center.CenterRoot;
 import com.rm.smart_inventory_android.io.models.inventory.InventoryRoot;
 import com.rm.smart_inventory_android.io.models.login.UserRoot;
+import com.rm.smart_inventory_android.io.models.state.StateRoot;
 
 import java.util.Map;
 
@@ -17,7 +18,7 @@ public interface Service {
     String wsLogin = "login/mobile";
     String wsCenter = "center/data";
     String wsInventory = "master/data";
-    String wsStatus = "material/status";
+    String wsState = "material/state";
     String wsLogout = "logout/mobile";
 
     @POST(wsLogin)
@@ -31,4 +32,7 @@ public interface Service {
 
     @POST(wsLogout)
     Call<UserRoot> logout(@Query("user_id") String userId);
+
+    @GET(wsState)
+    Call<StateRoot> getStates();
 }
