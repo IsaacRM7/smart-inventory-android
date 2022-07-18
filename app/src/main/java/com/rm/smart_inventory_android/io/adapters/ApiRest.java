@@ -1,5 +1,7 @@
 package com.rm.smart_inventory_android.io.adapters;
 
+import androidx.annotation.NonNull;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -49,8 +51,9 @@ public class ApiRest {
                 .create();
 
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
+            @NonNull
             @Override
-            public Response intercept(Chain chain) throws IOException {
+            public Response intercept(@NonNull Chain chain) throws IOException {
                 Request newRequest  = chain.request().newBuilder()
                         .addHeader("Authorization", "Bearer " + TOKEN)
                         .build();

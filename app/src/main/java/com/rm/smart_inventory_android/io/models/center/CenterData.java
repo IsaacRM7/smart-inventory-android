@@ -1,32 +1,45 @@
 package com.rm.smart_inventory_android.io.models.center;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+import androidx.room.TypeConverters;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.rm.smart_inventory_android.io.Converter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
 public class CenterData {
 
+    @PrimaryKey
     @SerializedName("id")
     @Expose
     private int id;
 
+    @ColumnInfo(name = "code")
     @SerializedName("code")
     @Expose
     private String code;
 
+    @ColumnInfo(name = "name")
     @SerializedName("name")
     @Expose
     private String name;
 
+    @ColumnInfo(name = "count")
     @SerializedName("count")
     @Expose
     private int count;
 
+    @TypeConverters(Converter.class)
     @SerializedName("warehouses")
     @Expose
-    private List<WarehouseData> warehouses = new ArrayList<WarehouseData>();
+    private List<WarehouseData> warehouses = new ArrayList<>();
 
     private boolean expandable;
 

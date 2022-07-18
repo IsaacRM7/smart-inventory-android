@@ -1,5 +1,6 @@
 package com.rm.smart_inventory_android.ui.activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -35,6 +36,12 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        if(!Preferences.get(Login.this, "token").equals("")){
+            Intent intent = new Intent(Login.this, Center.class);
+            startActivity(intent);
+            finish();
+        }
+
         inputUser = findViewById(R.id.input_user);
         inputPassword = findViewById(R.id.input_password);
         txtUser = findViewById(R.id.txt_user);
@@ -65,7 +72,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
         userCall.enqueue(new Callback<UserRoot>() {
             @Override
-            public void onResponse(Call<UserRoot> call, Response<UserRoot> response) {
+            public void onResponse(@NonNull Call<UserRoot> call, @NonNull Response<UserRoot> response) {
                 if(response.isSuccessful()){
                     assert response.body() != null;
                     boolean result = response.body().getResult();
@@ -96,8 +103,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             }
 
             @Override
-            public void onFailure(Call<UserRoot> call, Throwable t) {
-                System.out.println("Error perrón: "+t.getMessage());
+            public void onFailure(@NonNull Call<UserRoot> call, @NonNull Throwable t) {
+                t.getMessage();
             }
         });
     }
@@ -125,8 +132,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         logIn();
-        //Intent intent = new Intent(Login.this, Count.class);
-        //startActivity(intent);
     }
 
 

@@ -1,5 +1,6 @@
 package com.rm.smart_inventory_android.ui.activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -74,7 +75,7 @@ public class Inventory extends AppCompatActivity implements ClickListener {
                     return false;
 
                 case R.id.sync:
-                    System.out.println("Botón para sincronizar");
+                    Toast.makeText(this, "Botón sincronizar", Toast.LENGTH_SHORT).show();
                     return false;
 
                 default:
@@ -94,7 +95,7 @@ public class Inventory extends AppCompatActivity implements ClickListener {
 
         userRootCall.enqueue(new Callback<UserRoot>() {
             @Override
-            public void onResponse(Call<UserRoot> call, Response<UserRoot> response) {
+            public void onResponse(@NonNull Call<UserRoot> call, @NonNull Response<UserRoot> response) {
 
                 if(response.isSuccessful()) {
                     assert response.body() != null;
@@ -113,7 +114,7 @@ public class Inventory extends AppCompatActivity implements ClickListener {
             }
 
             @Override
-            public void onFailure(Call<UserRoot> call, Throwable t) {
+            public void onFailure(@NonNull Call<UserRoot> call, @NonNull Throwable t) {
 
             }
         });
@@ -124,7 +125,7 @@ public class Inventory extends AppCompatActivity implements ClickListener {
         Call<StateRoot> stateRootCall = service.getStates();
         stateRootCall.enqueue(new Callback<StateRoot>() {
             @Override
-            public void onResponse(Call<StateRoot> call, Response<StateRoot> response) {
+            public void onResponse(@NonNull Call<StateRoot> call, @NonNull Response<StateRoot> response) {
 
                 if(response.isSuccessful()){
                     StateRoot stateRoot = response.body();
@@ -142,7 +143,7 @@ public class Inventory extends AppCompatActivity implements ClickListener {
             }
 
             @Override
-            public void onFailure(Call<StateRoot> call, Throwable t) {
+            public void onFailure(@NonNull Call<StateRoot> call, @NonNull Throwable t) {
 
             }
         });
@@ -164,7 +165,7 @@ public class Inventory extends AppCompatActivity implements ClickListener {
         Call<InventoryRoot> inventoryRootCall = service.getInventory(params);
         inventoryRootCall.enqueue(new Callback<InventoryRoot>() {
             @Override
-            public void onResponse(Call<InventoryRoot> call, Response<InventoryRoot> response) {
+            public void onResponse(@NonNull Call<InventoryRoot> call, @NonNull Response<InventoryRoot> response) {
                 try{
                     if(response.isSuccessful()){
                         InventoryRoot inventoryRoot = response.body();
@@ -195,7 +196,7 @@ public class Inventory extends AppCompatActivity implements ClickListener {
             }
 
             @Override
-            public void onFailure(Call<InventoryRoot> call, Throwable t) {
+            public void onFailure(@NonNull Call<InventoryRoot> call, @NonNull Throwable t) {
                 System.out.println("Error: "+t.getMessage());
             }
         });
