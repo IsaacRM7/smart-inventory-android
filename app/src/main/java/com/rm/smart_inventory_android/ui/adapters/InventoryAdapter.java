@@ -68,6 +68,10 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.View
         return exampleFilter;
     }
 
+    public List<InventoryData> getFilteredList() {
+        return inventoryDataList;
+    }
+
     private final Filter exampleFilter = new Filter() {
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {

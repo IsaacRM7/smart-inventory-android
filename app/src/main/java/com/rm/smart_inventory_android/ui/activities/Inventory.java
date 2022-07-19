@@ -37,7 +37,6 @@ import retrofit2.Response;
 public class Inventory extends AppCompatActivity implements ClickListener, SearchView.OnQueryTextListener {
 
     private InventoryAdapter inventoryAdapter;
-    private ArrayList<InventoryData> inventoryDataArrayList;
     private List<InventoryData> inventoryDataList;
     private InventoryDataBase db;
     private SearchView searchView;
@@ -96,6 +95,7 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
 
         getInventory();
         getStates();
+        //deleteInvetory();
     }
 
     private void logout(){
@@ -160,7 +160,6 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
     }
 
     private void getInventory(){
-        inventoryDataArrayList = new ArrayList<>();
         String idCount = Preferences.get(Inventory.this, "id_count_assigned");
         String idWarehouse = Preferences.get(Inventory.this, "warehouse_id");
         String idUser = Preferences.get(Inventory.this, "user_id");
@@ -183,20 +182,8 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
                         if(inventoryRoot.getResult()){
                             inventoryDataList = inventoryRoot.getData();
 
-                            for(int i=0;i<inventoryDataList.size();i++){
-                                int id = inventoryDataList.get(i).getId();
-                                String sku = inventoryDataList.get(i).getSku();
-                                String skuName = inventoryDataList.get(i).getSkuName();
-                                double theoretical = inventoryDataList.get(i).getTheoretical();
-                                double physical = inventoryDataList.get(i).getPhysical();
-                                double difference = theoretical-physical;
-
-                                inventoryDataArrayList.add(new InventoryData(sku, skuName, theoretical, physical, difference));
-                            }
-
                             db.inventoryDao().insertList(inventoryDataList);
                             inventoryAdapter.addList((ArrayList<InventoryData>) db.inventoryDao().getAll());
-                            //inventoryAdapter.addList(inventoryDataArrayList);
                         }
                         else{
                             Toast.makeText(Inventory.this, inventoryRoot.getMessage(), Toast.LENGTH_SHORT).show();
@@ -209,22 +196,35 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
 
             @Override
             public void onFailure(@NonNull Call<InventoryRoot> call, @NonNull Throwable t) {
-                System.out.println("Error: "+t.getMessage());
+                inventoryAdapter.addList((ArrayList<InventoryData>) db.inventoryDao().getAll());
             }
         });
+    }
+
+    public void deleteInvetory(){
+        db.clearAllTables();
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         Intent intent = new Intent(Inventory.this, Center.class);
+        deleteInvetory();
         startActivity(intent);
         finish();
     }
 
     @Override
     public void onClick(int position) {
-        System.out.println(position);
+        String skuName = inventoryAdapter.getFilteredList().get(position).getSkuName();
+        String sku = inventoryAdapter.getFilteredList().get(position).getSku();
+        String skuFamily = inventoryAdapter.getFilteredList().get(position).getFamily();
+
+        Intent intent = new Intent(Inventory.this, Count.class);
+        intent.putExtra("sku", sku);
+        intent.putExtra("skuName", skuName);
+        intent.putExtra("skuFamily", skuFamily);
+        startActivity(intent);
     }
 
     @Override
@@ -235,11 +235,7 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        //System.out.println("ÑÑ TEXT: "+newText);
-        //System.out.println("AAa: "+db.inventoryDao().findBySku(newText));
-        //inventoryAdapter.addList((ArrayList<InventoryData>) db.inventoryDao().findBySku(newText));
         inventoryAdapter.getFilter().filter(newText);
-        //inventoryAdapter.notifyDataSetChanged();
         return false;
     }
 }
