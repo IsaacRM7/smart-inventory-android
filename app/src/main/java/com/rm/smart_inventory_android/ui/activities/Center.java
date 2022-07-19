@@ -88,11 +88,9 @@ public class Center extends AppCompatActivity {
 
                             if(centerDataList.get(i).getCount() == 1){
                                 warehouseDataList.add(new CenterData(centerId, centerName+" ("+centerCode+") - ✔", items));
-                                //centerData.add(new CenterData(centerId, centerName+" ("+centerCode+") - ✔", warehouseList));
                             }
                             else{
                                 warehouseDataList.add(new CenterData(centerId, centerName+" ("+centerCode+")", items));
-                                //centerData.add(new CenterData(centerId, centerName+" ("+centerCode+")", warehouseList));
                             }
 
                         }

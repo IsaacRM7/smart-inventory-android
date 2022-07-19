@@ -1,38 +1,51 @@
 package com.rm.smart_inventory_android.io.models.inventory;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+@Entity
 public class InventoryData {
 
+    @PrimaryKey
     @SerializedName("id")
     @Expose
     private int id;
 
+    @ColumnInfo(name = "sku")
     @SerializedName("sku")
     @Expose
     private String sku;
 
+    @ColumnInfo(name = "sku_name")
     @SerializedName("sku_name")
     @Expose
     private String skuName;
 
+    @ColumnInfo(name = "family")
     @SerializedName("family")
     @Expose
     private String family;
 
+    @ColumnInfo(name = "family_name")
     @SerializedName("family_name")
     @Expose
     private String familyName;
 
+    @ColumnInfo(name = "theoretical")
     @SerializedName("theoretical")
     @Expose
     private double theoretical;
 
+    @ColumnInfo(name = "physical")
     @SerializedName("physical")
     @Expose
     private double physical;
 
+    @ColumnInfo(name = "difference")
     private double difference;
 
     public InventoryData(String sku, String skuName, double theoretical, double physical, double difference) {

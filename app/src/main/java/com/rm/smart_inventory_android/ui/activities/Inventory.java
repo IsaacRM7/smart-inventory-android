@@ -3,12 +3,14 @@ package com.rm.smart_inventory_android.ui.activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
@@ -17,6 +19,7 @@ import com.rm.smart_inventory_android.io.ClickListener;
 import com.rm.smart_inventory_android.io.Preferences;
 import com.rm.smart_inventory_android.io.adapters.ApiRest;
 import com.rm.smart_inventory_android.io.adapters.Service;
+import com.rm.smart_inventory_android.io.db.inventroy.InventoryDataBase;
 import com.rm.smart_inventory_android.io.models.inventory.InventoryData;
 import com.rm.smart_inventory_android.io.models.inventory.InventoryRoot;
 import com.rm.smart_inventory_android.io.models.login.UserRoot;
@@ -31,16 +34,19 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class Inventory extends AppCompatActivity implements ClickListener {
+public class Inventory extends AppCompatActivity implements ClickListener, SearchView.OnQueryTextListener {
 
     private InventoryAdapter inventoryAdapter;
     private ArrayList<InventoryData> inventoryDataArrayList;
     private List<InventoryData> inventoryDataList;
+    private InventoryDataBase db;
+    private SearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inventory);
+        db = InventoryDataBase.getInstance(Inventory.this);
 
         LinearLayoutManager linearLayout = new LinearLayoutManager(this);
 
@@ -51,6 +57,10 @@ public class Inventory extends AppCompatActivity implements ClickListener {
         recyclerView.setAdapter(inventoryAdapter);
 
         NavigationView navigationView = findViewById(R.id.navigation_view);
+
+        searchView = findViewById(R.id.searchview);
+        searchView.setOnQueryTextListener(this);
+        searchView.setQueryHint("Buscar SKU");
 
         navigationView.setNavigationItemSelectedListener(item -> {
 
@@ -184,7 +194,9 @@ public class Inventory extends AppCompatActivity implements ClickListener {
                                 inventoryDataArrayList.add(new InventoryData(sku, skuName, theoretical, physical, difference));
                             }
 
-                            inventoryAdapter.addList(inventoryDataArrayList);
+                            db.inventoryDao().insertList(inventoryDataList);
+                            inventoryAdapter.addList((ArrayList<InventoryData>) db.inventoryDao().getAll());
+                            //inventoryAdapter.addList(inventoryDataArrayList);
                         }
                         else{
                             Toast.makeText(Inventory.this, inventoryRoot.getMessage(), Toast.LENGTH_SHORT).show();
@@ -213,5 +225,17 @@ public class Inventory extends AppCompatActivity implements ClickListener {
     @Override
     public void onClick(int position) {
         System.out.println(position);
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+
+        return false;
     }
 }
