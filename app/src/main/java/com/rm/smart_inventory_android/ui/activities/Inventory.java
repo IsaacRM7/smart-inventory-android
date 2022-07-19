@@ -229,13 +229,17 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-
+        db.inventoryDao().findBySku(query);
         return false;
     }
 
     @Override
     public boolean onQueryTextChange(String newText) {
-
+        //System.out.println("ÑÑ TEXT: "+newText);
+        //System.out.println("AAa: "+db.inventoryDao().findBySku(newText));
+        //inventoryAdapter.addList((ArrayList<InventoryData>) db.inventoryDao().findBySku(newText));
+        inventoryAdapter.getFilter().filter(newText);
+        //inventoryAdapter.notifyDataSetChanged();
         return false;
     }
 }

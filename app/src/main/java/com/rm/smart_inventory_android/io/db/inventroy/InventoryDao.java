@@ -21,7 +21,7 @@ public interface InventoryDao {
     @Query("SELECT * FROM inventorydata")
     List<InventoryData> getAll();
 
-    @Query("SELECT * FROM inventorydata WHERE sku LIKE :sku OR sku_name LIKE :sku")
+    @Query("SELECT * FROM inventorydata WHERE sku LIKE '%' || :sku || '%' OR sku_name LIKE '%' || :sku || '%'")
     List<InventoryData> findBySku(String sku);
 
     @Delete

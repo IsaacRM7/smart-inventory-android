@@ -1,9 +1,12 @@
 package com.rm.smart_inventory_android.ui.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -11,18 +14,21 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.rm.smart_inventory_android.R;
 import com.rm.smart_inventory_android.io.ClickListener;
+import com.rm.smart_inventory_android.io.db.inventroy.InventoryDataBase;
 import com.rm.smart_inventory_android.io.models.inventory.InventoryData;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.ViewHolder> {
+public class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.ViewHolder> implements Filterable {
 
     private Context context;
-    private List<InventoryData> inventoryDataList;
-    private ClickListener listener;
+    private final List<InventoryData> inventoryDataList;
+    private InventoryDataBase db;
+    private final ClickListener listener;
 
     public InventoryAdapter(Context context, ClickListener listener){
+        db = InventoryDataBase.getInstance(context);
         this.context = context;
         this.listener = listener;
         inventoryDataList = new ArrayList<>();
@@ -50,10 +56,34 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.View
         return inventoryDataList.size();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void addList(ArrayList<InventoryData> list){
         inventoryDataList.addAll(list);
         notifyDataSetChanged();
     }
+
+    @Override
+    public Filter getFilter() {
+
+        return exampleFilter;
+    }
+
+    private final Filter exampleFilter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+
+            return null;
+        }
+
+        //Solo este método hace el fitro de los sku
+        @SuppressLint("NotifyDataSetChanged")
+        @Override
+        protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+            inventoryDataList.clear();
+            inventoryDataList.addAll(db.inventoryDao().findBySku(charSequence.toString()));
+            notifyDataSetChanged();
+        }
+    };
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
