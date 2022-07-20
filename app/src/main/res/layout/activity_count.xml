@@ -59,7 +59,7 @@
                 android:orientation="horizontal">
 
                 <TextView
-                    android:id="@+id/sku_counted"
+                    android:id="@+id/txt_sku_count"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
@@ -69,7 +69,7 @@
                     android:textSize="20sp" />
 
                 <TextView
-                    android:id="@+id/flavor_counted"
+                    android:id="@+id/txt_family_count"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -78,7 +78,7 @@
                     android:textSize="20sp" />
 
                 <TextView
-                    android:id="@+id/presentation_counted"
+                    android:id="@+id/txt_sku_name_count"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -343,7 +343,7 @@
                     android:textSize="22sp" />
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recycler_measurement_units"
+                    android:id="@+id/recycler_count"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="horizontal" />
