@@ -7,10 +7,10 @@ import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
@@ -25,6 +25,7 @@ import com.rm.smart_inventory_android.io.models.inventory.InventoryRoot;
 import com.rm.smart_inventory_android.io.models.login.UserRoot;
 import com.rm.smart_inventory_android.io.models.state.StateRoot;
 import com.rm.smart_inventory_android.ui.adapters.InventoryAdapter;
+import com.rm.smart_inventory_android.ui.dialogs.Progress;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,8 +40,8 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
     private InventoryAdapter inventoryAdapter;
     private List<InventoryData> inventoryDataList;
     private InventoryDataBase db;
-    private SearchView searchView;
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,7 +58,7 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
 
         NavigationView navigationView = findViewById(R.id.navigation_view);
 
-        searchView = findViewById(R.id.searchview);
+        SearchView searchView = findViewById(R.id.searchview);
         searchView.setOnQueryTextListener(this);
         searchView.setQueryHint("Buscar SKU");
 
@@ -95,7 +96,6 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
 
         getInventory();
         getStates();
-        //deleteInvetory();
     }
 
     private void logout(){
@@ -160,6 +160,7 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
     }
 
     private void getInventory(){
+        Progress.showProgressBar(Inventory.this);
         String idCount = Preferences.get(Inventory.this, "id_count_assigned");
         String idWarehouse = Preferences.get(Inventory.this, "warehouse_id");
         String idUser = Preferences.get(Inventory.this, "user_id");
@@ -188,14 +189,17 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
                         else{
                             Toast.makeText(Inventory.this, inventoryRoot.getMessage(), Toast.LENGTH_SHORT).show();
                         }
+                        Progress.dismissProgressBar();
                     }
                 }catch (Exception ex){
+                    Progress.dismissProgressBar();
                     System.out.println("ERROR: "+ex);
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<InventoryRoot> call, @NonNull Throwable t) {
+                Progress.dismissProgressBar();
                 inventoryAdapter.addList((ArrayList<InventoryData>) db.inventoryDao().getAll());
             }
         });

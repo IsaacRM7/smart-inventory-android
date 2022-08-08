@@ -29,7 +29,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     private TextInputLayout inputPassword;
     private EditText txtUser;
     private EditText txtPassword;
-    private Button btnLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,11 +41,11 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             finish();
         }
 
+        Button btnLogin = findViewById(R.id.btn_login);
         inputUser = findViewById(R.id.input_user);
         inputPassword = findViewById(R.id.input_password);
         txtUser = findViewById(R.id.txt_user);
         txtPassword = findViewById(R.id.txt_password);
-        btnLogin = findViewById(R.id.btn_login);
         btnLogin.setOnClickListener(this);
     }
 
@@ -59,6 +58,26 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         }
 
         sendLoginData(user, password);
+    }
+
+    private boolean validateForm(String user, String password) {
+        if (user!= null && user.isEmpty()){
+            inputUser.setError("Requerido");
+            return false;
+        }
+        else {
+            inputUser.setError(null);
+        }
+
+        if (password!= null && password.isEmpty()){
+            inputPassword.setError("Requerido");
+            return false;
+        }
+        else {
+            inputPassword.setError(null);
+        }
+
+        return true;
     }
 
     private void sendLoginData(String user, String password){
@@ -107,26 +126,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                 t.getMessage();
             }
         });
-    }
-
-    private boolean validateForm(String user, String password) {
-        if (user!= null && user.isEmpty()){
-            inputUser.setError("Requerido");
-            return false;
-        }
-        else {
-            inputUser.setError(null);
-        }
-
-        if (password!= null && password.isEmpty()){
-            inputPassword.setError("Requerido");
-            return false;
-        }
-        else {
-            inputPassword.setError(null);
-        }
-
-        return true;
     }
 
     @Override

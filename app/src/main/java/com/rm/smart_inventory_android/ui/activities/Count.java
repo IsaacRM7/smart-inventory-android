@@ -4,16 +4,20 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Html;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.rm.smart_inventory_android.R;
 import com.rm.smart_inventory_android.io.ClickListener;
+import com.rm.smart_inventory_android.io.Preferences;
 import com.rm.smart_inventory_android.io.models.count.CountData;
 import com.rm.smart_inventory_android.ui.adapters.CountAdapter;
 
@@ -43,43 +47,27 @@ public class Count extends AppCompatActivity implements ClickListener {
         TextView skuName = findViewById(R.id.txt_sku_name_count);
         TextView skuFamily = findViewById(R.id.txt_family_count);
         TextView location;
-        Button b0;
-        Button b1;
-        Button b2;
-        Button b3;
-        Button b4;
-        Button b5;
-        Button b6;
-        Button b7;
-        Button b8;
-        Button b9;
-        Button bClear;
-        Button bDot;
-        Button bEquals;
-        Button bPlus;
-        Button bMinus;
-        Button bTimes;
-        Button bDivide;
+        Button b0 = findViewById(R.id.button0);
+        Button b1 = findViewById(R.id.button1);
+        Button b2 = findViewById(R.id.button2);
+        Button b3 = findViewById(R.id.button3);
+        Button b4 = findViewById(R.id.button4);
+        Button b5 = findViewById(R.id.button5);
+        Button b6 = findViewById(R.id.button6);
+        Button b7 = findViewById(R.id.button7);
+        Button b8 = findViewById(R.id.button8);
+        Button b9 = findViewById(R.id.button9);
+        Button bClear = findViewById(R.id.clear_button);
+        Button bDot = findViewById(R.id.dot_button);
+        Button bEquals = findViewById(R.id.equals_button);
+        Button bPlus = findViewById(R.id.plus_button);
+        Button bMinus = findViewById(R.id.minus_button);
+        Button bTimes = findViewById(R.id.times_button);
+        Button bDivide = findViewById(R.id.divide_button);
+        FloatingActionButton fab = findViewById(R.id.send_data_fab);
 
         numbersBox = findViewById(R.id.txt_numbers);
 
-        b0 = findViewById(R.id.button0);
-        b1 = findViewById(R.id.button1);
-        b2 = findViewById(R.id.button2);
-        b3 = findViewById(R.id.button3);
-        b4 = findViewById(R.id.button4);
-        b5 = findViewById(R.id.button5);
-        b6 = findViewById(R.id.button6);
-        b7 = findViewById(R.id.button7);
-        b8 = findViewById(R.id.button8);
-        b9 = findViewById(R.id.button9);
-        bClear = findViewById(R.id.clear_button);
-        bDot = findViewById(R.id.dot_button);
-        bEquals = findViewById(R.id.equals_button);
-        bPlus = findViewById(R.id.plus_button);
-        bMinus = findViewById(R.id.minus_button);
-        bTimes = findViewById(R.id.times_button);
-        bDivide = findViewById(R.id.divide_button);
         location = findViewById(R.id.txt_location);
 
         Intent intent = getIntent();
@@ -261,7 +249,7 @@ public class Count extends AppCompatActivity implements ClickListener {
         });
 
         bEquals.setOnClickListener(v -> {
-            double number2 = 0;
+            double number2;
 
             switch (operation) {
                 case "":
@@ -273,7 +261,6 @@ public class Count extends AppCompatActivity implements ClickListener {
                         if (number2 != 0) {
                             equals = number1 + number2;
                             numbersBox.setText(String.valueOf(Math.round(equals*100.0)/100.0));
-                            //numbersBox.setText(String.format("%.2f", equals));
                             chain = String.valueOf(equals);
                             operation = "";
                             dots = 1;
@@ -286,7 +273,6 @@ public class Count extends AppCompatActivity implements ClickListener {
                         if (number2 != 0) {
                             equals = number1 - number2;
                             numbersBox.setText(String.valueOf(Math.round(equals*100.0)/100.0));
-                            //numbersBox.setText(String.format("%.2f", equals));
                             chain = String.valueOf(equals);
                             operation = "";
                             dots = 1;
@@ -299,7 +285,6 @@ public class Count extends AppCompatActivity implements ClickListener {
                         if (number2 != 0) {
                             equals = number1 * number2;
                             numbersBox.setText(String.valueOf(Math.round(equals*100.0)/100.0));
-                            //numbersBox.setText(String.format("%.2f", equals));
                             chain = String.valueOf(equals);
                             operation = "";
                             dots = 1;
@@ -312,7 +297,6 @@ public class Count extends AppCompatActivity implements ClickListener {
                         if (number2 != 0) {
                             equals = number1 / number2;
                             numbersBox.setText(String.valueOf(Math.round(equals*100.0)/100.0));
-                            //numbersBox.setText(String.format("%.2f", equals));
                             chain = String.valueOf(equals);
                             operation = "";
                             dots = 1;
@@ -321,6 +305,17 @@ public class Count extends AppCompatActivity implements ClickListener {
                     }
                 default: break;
             }
+        });
+
+        fab.setOnClickListener(view -> {
+            final String chain = Preferences.get(Count.this, "stateList");
+            final String[] states = chain.substring(1, chain.length() - 1).split(", ");
+            AlertDialog.Builder builder = new AlertDialog.Builder(Count.this);
+            builder.setTitle(Html.fromHtml("<font color='#2BA4E9'>¿Qué se contó?</font>"));
+            builder.setItems(states, (dialogInterface, i) -> {
+                 dialogInterface.dismiss();
+            }).show();
+
         });
     }
 

@@ -17,6 +17,7 @@ import com.rm.smart_inventory_android.io.models.center.CenterData;
 import com.rm.smart_inventory_android.io.models.center.CenterRoot;
 import com.rm.smart_inventory_android.io.models.center.WarehouseData;
 import com.rm.smart_inventory_android.ui.adapters.CenterAdapter;
+import com.rm.smart_inventory_android.ui.dialogs.Progress;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,7 +38,6 @@ public class Center extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_center);
-
         warehouseDataList = new ArrayList<>();
 
         centerRecyclerview = findViewById(R.id.warehouse_recycler);
@@ -48,6 +48,8 @@ public class Center extends AppCompatActivity {
     }
 
     private void getCenters(){
+        Progress.showProgressBar(Center.this);
+
         Service service = ApiRest.getInterceptedApi().create(Service.class);
         db = CenterDataBase.getInstance(Center.this);
 
@@ -100,16 +102,19 @@ public class Center extends AppCompatActivity {
 
                         centerAdapter = new CenterAdapter(warehouseDataList, Center.this);
                         centerRecyclerview.setAdapter(centerAdapter);
+                        Progress.dismissProgressBar();
                     }
                 }catch (Exception ex){
+                    Progress.dismissProgressBar();
                     Toast.makeText(Center.this, "Ocurrió un error", Toast.LENGTH_SHORT).show();
+
                     ex.getLocalizedMessage();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<CenterRoot> call, @NonNull Throwable t) {
-
+                Progress.dismissProgressBar();
                 loadDatabaseCenters();
                 t.getMessage();
             }
