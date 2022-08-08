@@ -11,6 +11,8 @@ import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
@@ -98,7 +100,24 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
         getStates();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.logo_item) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(Inventory.this);
+            builder.setMessage("Usuario: "+Preferences.get(Inventory.this, "user")).show();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void logout(){
+        Progress.showProgressDialog(Inventory.this);
         Service service = ApiRest.getInterceptedApi().create(Service.class);
         String idUser = Preferences.get(Inventory.this, "user_id");
         Call<UserRoot> userRootCall = service.logout(idUser);
@@ -121,11 +140,13 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
                     startActivity(intent);
                     finish();
                 }
+
+                Progress.dismissProgressDialog(Inventory.this);
             }
 
             @Override
             public void onFailure(@NonNull Call<UserRoot> call, @NonNull Throwable t) {
-
+                Progress.dismissProgressDialog(Inventory.this);
             }
         });
     }
@@ -189,8 +210,8 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
                         else{
                             Toast.makeText(Inventory.this, inventoryRoot.getMessage(), Toast.LENGTH_SHORT).show();
                         }
-                        Progress.dismissProgressBar();
                     }
+                    Progress.dismissProgressBar();
                 }catch (Exception ex){
                     Progress.dismissProgressBar();
                     System.out.println("ERROR: "+ex);

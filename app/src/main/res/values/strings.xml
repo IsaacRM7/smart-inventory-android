@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SmartInventory</string>
+    <string name="app_name">Smart Inventory</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="user">USUARIO</string>
@@ -27,10 +27,8 @@
     <string name="FLAVOR">SABOR:</string>
     <string name="PRESENTATION">PRESENTACION:</string>
     <string name="inventorycount">Conteo de Inventario</string>
-    <string name="countless">El usuario no está asignado para realizar conteo.</string>
     <string name="unknown_problem">Ocurrió un problema</string>
     <string name="valid_data">Digite un usuario válido</string>
-    <string name="sending_data">Enviando datos al servidor, espere un momento…</string>
     <string name="loading">Cargando…</string>
     <string name="no1">1</string>
     <string name="no2">2</string>
@@ -90,4 +88,5 @@
     <string name="image">image</string>
     <string name="type_your_ansquer">Escriba la dirección</string>
     <string name="no_internet">Sin conexión a internet, los datos se guardarán para ser sincronizados.</string>
+    <string name="logo">logo</string>
 </resources>

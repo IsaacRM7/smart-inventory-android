@@ -16,8 +16,10 @@ import com.rm.smart_inventory_android.io.Preferences;
 import com.rm.smart_inventory_android.io.adapters.ApiRest;
 import com.rm.smart_inventory_android.io.adapters.Service;
 import com.rm.smart_inventory_android.io.models.login.UserRoot;
+import com.rm.smart_inventory_android.ui.dialogs.Progress;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -34,6 +36,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        Objects.requireNonNull(getSupportActionBar()).hide();
 
         if(!Preferences.get(Login.this, "token").equals("")){
             Intent intent = new Intent(Login.this, Center.class);
@@ -81,6 +85,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     }
 
     private void sendLoginData(String user, String password){
+        Progress.showProgressDialog(Login.this);
         Service service = ApiRest.getApi().create(Service.class);
 
         HashMap<String, String> params = new HashMap<>();
@@ -109,6 +114,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                         Preferences.save(Login.this, "user_id", String.valueOf(id));
                         Preferences.save(Login.this, "id_count_assigned", String.valueOf(idCount));
 
+                        Progress.dismissProgressDialog(Login.this);
+
                         Toast.makeText(Login.this, message, Toast.LENGTH_SHORT).show();
 
                         Intent intent = new Intent(Login.this, Center.class);
@@ -116,6 +123,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                         finish();
                     }
                     else{
+                        Progress.dismissProgressDialog(Login.this);
                         Toast.makeText(Login.this, message, Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -123,6 +131,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
             @Override
             public void onFailure(@NonNull Call<UserRoot> call, @NonNull Throwable t) {
+                Progress.dismissProgressDialog(Login.this);
                 t.getMessage();
             }
         });

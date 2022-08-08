@@ -1,11 +1,14 @@
 package com.rm.smart_inventory_android.ui.activities;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.rm.smart_inventory_android.R;
@@ -45,6 +48,22 @@ public class Center extends AppCompatActivity {
         centerRecyclerview.setLayoutManager(new LinearLayoutManager(this));
 
         getCenters();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.logo_item) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(Center.this);
+            builder.setMessage("Usuario: "+Preferences.get(Center.this, "user")).show();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void getCenters(){

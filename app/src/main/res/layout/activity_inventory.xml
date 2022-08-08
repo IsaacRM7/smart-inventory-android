@@ -22,15 +22,16 @@
 
         <androidx.appcompat.widget.SearchView
             android:id="@+id/searchview"
+            android:background="@drawable/material_shape"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"/>
+            android:layout_margin="7dp"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/sku_recycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="20dp" />
+            android:layout_margin="15dp" />
 
     </LinearLayout>
 

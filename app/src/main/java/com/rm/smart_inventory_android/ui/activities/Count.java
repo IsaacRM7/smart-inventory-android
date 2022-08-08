@@ -1,5 +1,6 @@
 package com.rm.smart_inventory_android.ui.activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -11,6 +12,8 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Html;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -20,6 +23,7 @@ import com.rm.smart_inventory_android.io.ClickListener;
 import com.rm.smart_inventory_android.io.Preferences;
 import com.rm.smart_inventory_android.io.models.count.CountData;
 import com.rm.smart_inventory_android.ui.adapters.CountAdapter;
+import com.rm.smart_inventory_android.ui.dialogs.LocationDialog;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -43,6 +47,7 @@ public class Count extends AppCompatActivity implements ClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_count);
 
+        TextView finalLocation;
         TextView sku = findViewById(R.id.txt_sku_count);
         TextView skuName = findViewById(R.id.txt_sku_name_count);
         TextView skuFamily = findViewById(R.id.txt_family_count);
@@ -317,6 +322,25 @@ public class Count extends AppCompatActivity implements ClickListener {
             }).show();
 
         });
+
+        finalLocation = location;
+        location.setOnClickListener(view -> LocationDialog.openQuestion(getResources().getString(R.string.app_name), "Ingrese su ubicación", Count.this, (i, response) -> finalLocation.setText(response)));
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.logo_item) {
+            androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(Count.this);
+            builder.setMessage("Usuario: "+Preferences.get(Count.this, "user")).show();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void getAmountList(){
