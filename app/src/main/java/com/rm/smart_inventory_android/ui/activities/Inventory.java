@@ -119,7 +119,10 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
     private void logout(){
         Progress.showProgressDialog(Inventory.this);
         Service service = ApiRest.getInterceptedApi().create(Service.class);
+        String token = Preferences.get(Inventory.this, "token");
         String idUser = Preferences.get(Inventory.this, "user_id");
+
+        ApiRest.TOKEN = token;
         Call<UserRoot> userRootCall = service.logout(idUser);
 
         userRootCall.enqueue(new Callback<UserRoot>() {
@@ -153,6 +156,8 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
 
     private void getStates(){
         Service service = ApiRest.getInterceptedApi().create(Service.class);
+        String token = Preferences.get(Inventory.this, "token");
+        ApiRest.TOKEN = token;
         Call<StateRoot> stateRootCall = service.getStates();
         stateRootCall.enqueue(new Callback<StateRoot>() {
             @Override
@@ -185,6 +190,8 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
         String idCount = Preferences.get(Inventory.this, "id_count_assigned");
         String idWarehouse = Preferences.get(Inventory.this, "warehouse_id");
         String idUser = Preferences.get(Inventory.this, "user_id");
+        String token = Preferences.get(Inventory.this, "token");
+        ApiRest.TOKEN = token;
 
         Service service = ApiRest.getInterceptedApi().create(Service.class);
         HashMap<String, String> params = new HashMap<>();
@@ -244,11 +251,13 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
         String skuName = inventoryAdapter.getFilteredList().get(position).getSkuName();
         String sku = inventoryAdapter.getFilteredList().get(position).getSku();
         String skuFamily = inventoryAdapter.getFilteredList().get(position).getFamily();
+        int id = inventoryAdapter.getFilteredList().get(position).getId();
 
         Intent intent = new Intent(Inventory.this, Count.class);
         intent.putExtra("sku", sku);
         intent.putExtra("skuName", skuName);
         intent.putExtra("skuFamily", skuFamily);
+        intent.putExtra("skuId", id);
         startActivity(intent);
     }
 

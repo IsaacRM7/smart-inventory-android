@@ -16,12 +16,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.rm.smart_inventory_android.R;
 import com.rm.smart_inventory_android.io.ClickListener;
 import com.rm.smart_inventory_android.io.Preferences;
+import com.rm.smart_inventory_android.io.adapters.ApiRest;
+import com.rm.smart_inventory_android.io.adapters.Service;
 import com.rm.smart_inventory_android.io.models.count.CountData;
+import com.rm.smart_inventory_android.io.models.count.CountedData;
+import com.rm.smart_inventory_android.io.models.login.UserRoot;
 import com.rm.smart_inventory_android.ui.adapters.CountAdapter;
 import com.rm.smart_inventory_android.ui.dialogs.LocationDialog;
 
@@ -29,7 +34,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class Count extends AppCompatActivity implements ClickListener {
 
@@ -39,15 +49,24 @@ public class Count extends AppCompatActivity implements ClickListener {
     private int dots = 0;
     private double equals;
     private double number1;
+    private Object platforms;
+    private Object boxes;
+    private Object units;
+    private Object giroPallet;
+    private Object separator;
+    private Object squares;
+    private Object level;
+    private Object expirationDate;
     private ArrayList<CountData> countDataArrayList;
     private CountAdapter countAdapter;
+    private Intent intent;
+    private TextView finalLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_count);
 
-        TextView finalLocation;
         TextView sku = findViewById(R.id.txt_sku_count);
         TextView skuName = findViewById(R.id.txt_sku_name_count);
         TextView skuFamily = findViewById(R.id.txt_family_count);
@@ -73,9 +92,14 @@ public class Count extends AppCompatActivity implements ClickListener {
 
         numbersBox = findViewById(R.id.txt_numbers);
 
+        Calendar cal = Calendar.getInstance();
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH);
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+
         location = findViewById(R.id.txt_location);
 
-        Intent intent = getIntent();
+        intent = getIntent();
 
         sku.setText( intent.getStringExtra("sku"));
         skuName.setText( intent.getStringExtra("skuName"));
@@ -312,19 +336,61 @@ public class Count extends AppCompatActivity implements ClickListener {
             }
         });
 
+        finalLocation = location;
+        location.setOnClickListener(view -> LocationDialog.openQuestion(getResources().getString(R.string.app_name), "Ingrese su ubicación", Count.this, (i, response) -> finalLocation.setText(response)));
+
         fab.setOnClickListener(view -> {
             final String chain = Preferences.get(Count.this, "stateList");
             final String[] states = chain.substring(1, chain.length() - 1).split(", ");
+            final String chainId = Preferences.get(Count.this, "stateIdList");
+            final String[] statesId = chainId.substring(1, chainId.length() - 1).split(", ");
+
             AlertDialog.Builder builder = new AlertDialog.Builder(Count.this);
             builder.setTitle(Html.fromHtml("<font color='#2BA4E9'>¿Qué se contó?</font>"));
             builder.setItems(states, (dialogInterface, i) -> {
-                 dialogInterface.dismiss();
+                Service service = ApiRest.getInterceptedApi().create(Service.class);
+                HashMap<String, Object> params = new HashMap<>();
+                String token = Preferences.get(Count.this, "token");
+                ApiRest.TOKEN = token;
+
+                params.put("article_id", intent.getIntExtra("skuId", 0));
+                params.put("counted_article_id", 0);
+                params.put("material_status_id", statesId[i]);
+                params.put("wooden_platforms", platforms);
+                params.put("plastic_platforms", 0);
+                params.put("boxes", boxes);
+                params.put("units", units);
+                params.put("frames", squares);
+                params.put("giro_paleta", giroPallet);
+                params.put("location", finalLocation.getText());
+                params.put("expiration_date", expirationDate);
+                params.put("type_count", 1);
+                params.put("level", level);
+
+                Call<CountedData> userCall = service.sendCount(params);
+
+                userCall.enqueue(new Callback<CountedData>() {
+                    @Override
+                    public void onResponse(Call<CountedData> call, Response<CountedData> response) {
+                        dialogInterface.dismiss();
+                        if(response.isSuccessful()){
+                            Toast.makeText(Count.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<CountedData> call, Throwable t) {
+                        dialogInterface.dismiss();
+                        System.out.println("LA cagasete: "+t.getLocalizedMessage());
+                        t.printStackTrace();
+                        t.getMessage();
+                    }
+                });
+
             }).show();
 
         });
 
-        finalLocation = location;
-        location.setOnClickListener(view -> LocationDialog.openQuestion(getResources().getString(R.string.app_name), "Ingrese su ubicación", Count.this, (i, response) -> finalLocation.setText(response)));
     }
 
     @Override
@@ -345,7 +411,7 @@ public class Count extends AppCompatActivity implements ClickListener {
 
     private void getAmountList(){
         countDataArrayList = new ArrayList<>();
-        countDataArrayList.add(new CountData("Fecha", new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).format(new Date()), ""));
+        countDataArrayList.add(new CountData("Fecha", new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date()), ""));
         countDataArrayList.add(new CountData("Tarimas", 0, 0));
         countDataArrayList.add(new CountData("Cajas", 0, 0));
         countDataArrayList.add(new CountData("Unidades", 0, 0));
@@ -353,6 +419,15 @@ public class Count extends AppCompatActivity implements ClickListener {
         countDataArrayList.add(new CountData("Separador", 0, 0));
         countDataArrayList.add(new CountData("Marcos", 0, 0));
         countDataArrayList.add(new CountData("Nivel", 0, 0));
+
+        expirationDate = countDataArrayList.get(0).getAmount();
+        platforms = countDataArrayList.get(1).getAmount();
+        boxes = countDataArrayList.get(2).getAmount();
+        units = countDataArrayList.get(3).getAmount();
+        giroPallet = countDataArrayList.get(4).getAmount();
+        separator = countDataArrayList.get(5).getAmount();
+        squares = countDataArrayList.get(6).getAmount();
+        level = countDataArrayList.get(7).getAmount();
 
         countAdapter.addList(countDataArrayList);
     }
@@ -368,7 +443,8 @@ public class Count extends AppCompatActivity implements ClickListener {
             DatePickerDialog.OnDateSetListener mDateSetListener = (datePicker, year1, month1, day1) -> {
                 month1 = month1 + 1;
 
-                String date = year1 + "/" + month1 + "/" + day1;
+                String date = year1 + "-" + month1 + "-" + day1;
+                expirationDate = date;
                 countDataArrayList.get(0).setAmount(date);
                 countAdapter.notifyItemChanged(0);
             };
@@ -385,7 +461,15 @@ public class Count extends AppCompatActivity implements ClickListener {
             if (!chain.equals("")) {
                 String amountCalculator = chain;
                 double number = Double.parseDouble(amountCalculator);
-                countDataArrayList.get(position).setAmount(Math.round(number * 100.0) / 100.0);
+                countDataArrayList.get(position).setAmount(number);
+                platforms = countDataArrayList.get(1).getAmount();
+                boxes = countDataArrayList.get(2).getAmount();
+                units = countDataArrayList.get(3).getAmount();
+                giroPallet = countDataArrayList.get(4).getAmount();
+                separator = countDataArrayList.get(5).getAmount();
+                squares = countDataArrayList.get(6).getAmount();
+                level = countDataArrayList.get(7).getAmount();
+
                 countAdapter.notifyItemChanged(position);
                 numbersBox.setText("");
                 numbersBox.setText("0");

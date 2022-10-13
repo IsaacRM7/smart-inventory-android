@@ -50,6 +50,9 @@ public class ApiRest {
                 .setLenient()
                 .create();
 
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
             @NonNull
             @Override
@@ -59,7 +62,8 @@ public class ApiRest {
                         .build();
                 return chain.proceed(newRequest);
             }
-        }).connectTimeout(1, TimeUnit.MINUTES)
+        }).addInterceptor(interceptor)
+                .connectTimeout(1, TimeUnit.MINUTES)
                 .writeTimeout(1, TimeUnit.MINUTES)
                 .readTimeout(1, TimeUnit.MINUTES)
                 .build();

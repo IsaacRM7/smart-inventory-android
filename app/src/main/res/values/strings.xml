@@ -89,4 +89,5 @@
     <string name="type_your_ansquer">Escriba la dirección</string>
     <string name="no_internet">Sin conexión a internet, los datos se guardarán para ser sincronizados.</string>
     <string name="logo">logo</string>
+    <string name="sending_data">enviar</string>
 </resources>
