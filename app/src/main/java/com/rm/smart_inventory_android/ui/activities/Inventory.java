@@ -259,6 +259,7 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
         intent.putExtra("skuFamily", skuFamily);
         intent.putExtra("skuId", id);
         startActivity(intent);
+        finish();
     }
 
     @Override

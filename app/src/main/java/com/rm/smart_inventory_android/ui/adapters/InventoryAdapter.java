@@ -2,11 +2,13 @@ package com.rm.smart_inventory_android.ui.adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -44,11 +46,22 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.View
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         InventoryData inventoryData = inventoryDataList.get(position);
+
+        if(inventoryData.getTheoretical() > inventoryData.getPhysical()){
+            holder.circleImage.setColorFilter(Color.parseColor("#FF0000"));
+        }
+        else if(inventoryData.getTheoretical() < inventoryData.getPhysical()){
+            holder.circleImage.setColorFilter(Color.parseColor("#0000FF"));
+        }
+        else{
+            holder.circleImage.setColorFilter(Color.parseColor("#00FF00"));
+        }
+
         holder.sku.setText(inventoryData.getSku());
         holder.skuName.setText(inventoryData.getSkuName());
         holder.theoretical.setText(String.valueOf(inventoryData.getTheoretical()));
         holder.physical.setText(String.valueOf(inventoryData.getPhysical()));
-        holder.difference.setText(String.valueOf(inventoryData.getDifference()));
+        holder.difference.setText(String.valueOf(inventoryData.getTheoretical() - inventoryData.getPhysical()));
     }
 
     @Override
@@ -96,6 +109,7 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.View
         private TextView theoretical;
         private TextView physical;
         private TextView difference;
+        private ImageView circleImage;
         private ClickListener listener;
 
         public ViewHolder(@NonNull View itemView, ClickListener listener) {
@@ -106,6 +120,7 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.View
             theoretical = itemView.findViewById(R.id.txt_theoretical);
             physical = itemView.findViewById(R.id.txt_physical);
             difference = itemView.findViewById(R.id.txt_difference);
+            circleImage = itemView.findViewById(R.id.image_circle);
 
             this.listener = listener;
 

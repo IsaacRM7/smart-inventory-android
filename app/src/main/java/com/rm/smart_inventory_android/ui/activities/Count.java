@@ -25,9 +25,10 @@ import com.rm.smart_inventory_android.io.Preferences;
 import com.rm.smart_inventory_android.io.adapters.ApiRest;
 import com.rm.smart_inventory_android.io.adapters.Service;
 import com.rm.smart_inventory_android.io.models.count.CountData;
-import com.rm.smart_inventory_android.io.models.count.CountedData;
-import com.rm.smart_inventory_android.io.models.login.UserRoot;
+import com.rm.smart_inventory_android.io.models.count.RecountData;
+import com.rm.smart_inventory_android.io.models.count.SendCountData;
 import com.rm.smart_inventory_android.ui.adapters.CountAdapter;
+import com.rm.smart_inventory_android.ui.adapters.CountedAdapter;
 import com.rm.smart_inventory_android.ui.dialogs.LocationDialog;
 
 import java.text.SimpleDateFormat;
@@ -35,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 import retrofit2.Call;
@@ -43,6 +45,7 @@ import retrofit2.Response;
 
 public class Count extends AppCompatActivity implements ClickListener {
 
+    private RecyclerView recountRecyclerView;
     private TextView numbersBox;
     private String chain = "";
     private String operation="";
@@ -61,12 +64,17 @@ public class Count extends AppCompatActivity implements ClickListener {
     private CountAdapter countAdapter;
     private Intent intent;
     private TextView finalLocation;
+    private List<RecountData> recountDataList;
+    private CountedAdapter countedAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_count);
 
+        recountRecyclerView = findViewById(R.id.recycler_view_recounted);
+        recountRecyclerView.setHasFixedSize(true);
+        recountRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         TextView sku = findViewById(R.id.txt_sku_count);
         TextView skuName = findViewById(R.id.txt_sku_name_count);
         TextView skuFamily = findViewById(R.id.txt_family_count);
@@ -91,11 +99,6 @@ public class Count extends AppCompatActivity implements ClickListener {
         FloatingActionButton fab = findViewById(R.id.send_data_fab);
 
         numbersBox = findViewById(R.id.txt_numbers);
-
-        Calendar cal = Calendar.getInstance();
-        int year = cal.get(Calendar.YEAR);
-        int month = cal.get(Calendar.MONTH);
-        int day = cal.get(Calendar.DAY_OF_MONTH);
 
         location = findViewById(R.id.txt_location);
 
@@ -367,11 +370,11 @@ public class Count extends AppCompatActivity implements ClickListener {
                 params.put("type_count", 1);
                 params.put("level", level);
 
-                Call<CountedData> userCall = service.sendCount(params);
+                Call<SendCountData> userCall = service.sendCount(params);
 
-                userCall.enqueue(new Callback<CountedData>() {
+                userCall.enqueue(new Callback<SendCountData>() {
                     @Override
-                    public void onResponse(Call<CountedData> call, Response<CountedData> response) {
+                    public void onResponse(Call<SendCountData> call, Response<SendCountData> response) {
                         dialogInterface.dismiss();
                         if(response.isSuccessful()){
                             Toast.makeText(Count.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
@@ -379,7 +382,7 @@ public class Count extends AppCompatActivity implements ClickListener {
                     }
 
                     @Override
-                    public void onFailure(Call<CountedData> call, Throwable t) {
+                    public void onFailure(Call<SendCountData> call, Throwable t) {
                         dialogInterface.dismiss();
                         System.out.println("LA cagasete: "+t.getLocalizedMessage());
                         t.printStackTrace();
@@ -387,9 +390,15 @@ public class Count extends AppCompatActivity implements ClickListener {
                     }
                 });
 
+                Intent intent = new Intent(Count.this, Inventory.class);
+                startActivity(intent);
+                finish();
+
             }).show();
 
         });
+
+        getCountedList();
 
     }
 
@@ -430,6 +439,61 @@ public class Count extends AppCompatActivity implements ClickListener {
         level = countDataArrayList.get(7).getAmount();
 
         countAdapter.addList(countDataArrayList);
+    }
+
+    private void getCountedList(){
+        recountDataList = new ArrayList<>();
+
+        Service service = ApiRest.getInterceptedApi().create(Service.class);
+        String token = Preferences.get(Count.this, "token");
+        int id = intent.getIntExtra("skuId", 0);
+        ApiRest.TOKEN = token;
+
+        Call<List<RecountData>> recountDataCall = service.getCountedData(id);
+        recountDataCall.enqueue(new Callback<List<RecountData>>() {
+            @Override
+            public void onResponse(Call<List<RecountData>> call, Response<List<RecountData>> response) {
+
+                if (response.isSuccessful()) {
+                    String boxes = "";
+                    String units = "";
+                    String plasticPlatforms = "";
+                    String woodenPlatforms = "";
+                    String date = "";
+                    String user = "";
+                    int status = 0;
+                    if(response.body() != null){
+                        for(int i=0;i<response.body().size();i++){
+                            boxes = response.body().get(i).getBoxes();
+                            units = response.body().get(i).getUnits();
+                            plasticPlatforms = response.body().get(i).getPlasticPlatforms();
+                            woodenPlatforms = response.body().get(i).getWoodenPlatforms();
+                            date = response.body().get(i).getDate();
+                            user = response.body().get(i).getUser();
+                            status = response.body().get(i).getStatus();
+                        }
+
+                        recountDataList.add(new RecountData(user, boxes, units, woodenPlatforms, plasticPlatforms, status, date));
+                        countedAdapter = new CountedAdapter(Count.this, recountDataList);
+                        recountRecyclerView.setAdapter(countedAdapter);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<RecountData>> call, Throwable t) {
+                t.getLocalizedMessage();
+            }
+        });
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(Count.this, Inventory.class);
+        startActivity(intent);
+        finish();
     }
 
     @Override

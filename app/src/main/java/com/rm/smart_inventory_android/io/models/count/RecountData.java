@@ -3,26 +3,36 @@ package com.rm.smart_inventory_android.io.models.count;
 import com.google.gson.annotations.SerializedName;
 
 public class RecountData {
-    public int id;
+    private int id;
     @SerializedName("article_id")
-    public int articleId;
-    public String user;
-    public String boxes;
-    public String units;
+    private int articleId;
+    private String user;
+    private String boxes;
+    private String units;
     @SerializedName("wooden_platforms")
-    public String woodenPlatforms;
+    private String woodenPlatforms;
     @SerializedName("plastic_platforms")
-    public String plasticPlatforms;
-    public String level;
-    public int status;
+    private String plasticPlatforms;
+    private String level;
+    private int status;
     @SerializedName("status_name")
-    public String statusName;
+    private String statusName;
     @SerializedName("conversion_to_boxes")
-    public String conversionToBoxes;
+    private String conversionToBoxes;
     @SerializedName("conversion_to_units")
-    public String conversionToUnits;
-    public String location;
-    public String date;
+    private String conversionToUnits;
+    private String location;
+    private String date;
+
+    public RecountData(String user, String boxes, String units, String woodenPlatforms, String plasticPlatforms, int status, String date) {
+        this.user = user;
+        this.boxes = boxes;
+        this.units = units;
+        this.woodenPlatforms = woodenPlatforms;
+        this.plasticPlatforms = plasticPlatforms;
+        this.status = status;
+        this.date = date;
+    }
 
     public int getId() {
         return id;

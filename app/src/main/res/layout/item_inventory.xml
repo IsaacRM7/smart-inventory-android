@@ -38,12 +38,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="15sp"
+            android:text="@string/theoretical"
             android:layout_marginStart="6dp"/>
 
         <TextView
             android:id="@+id/txt_physical"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@string/physical"
             android:textSize="15sp"
             android:layout_marginStart="6dp"/>
 
@@ -51,12 +53,14 @@
             android:id="@+id/txt_difference"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@string/difference"
             android:textSize="15sp"
             android:layout_marginStart="6dp"/>
 
     </LinearLayout>
 
         <ImageView
+            android:id="@+id/image_circle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_circle"

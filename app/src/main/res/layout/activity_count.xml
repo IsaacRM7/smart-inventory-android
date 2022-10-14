@@ -369,7 +369,7 @@
             android:padding="12dp">
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_counted_products"
+                android:id="@+id/recycler_view_recounted"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 

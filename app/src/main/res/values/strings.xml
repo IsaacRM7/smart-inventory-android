@@ -90,4 +90,7 @@
     <string name="no_internet">Sin conexión a internet, los datos se guardarán para ser sincronizados.</string>
     <string name="logo">logo</string>
     <string name="sending_data">enviar</string>
+    <string name="physical">Físico: %d</string>
+    <string name="theoretical">Teórico: %d</string>
+    <string name="difference">Diferencia: %d</string>
 </resources>

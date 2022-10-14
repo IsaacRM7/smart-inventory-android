@@ -3,7 +3,7 @@ package com.rm.smart_inventory_android.io.models.count;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class CountedData {
+public class SendCountData {
 
     @SerializedName("message")
     @Expose
