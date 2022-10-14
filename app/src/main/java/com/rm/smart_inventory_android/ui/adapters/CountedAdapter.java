@@ -2,7 +2,6 @@ package com.rm.smart_inventory_android.ui.adapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.rm.smart_inventory_android.R;
 import com.rm.smart_inventory_android.io.Preferences;
 import com.rm.smart_inventory_android.io.models.count.RecountData;
-import com.rm.smart_inventory_android.ui.activities.Inventory;
 
 import java.util.List;
 
@@ -39,6 +37,7 @@ public class CountedAdapter extends RecyclerView.Adapter<CountedAdapter.CountedV
     @Override
     public void onBindViewHolder(@NonNull CountedViewHolder holder, int position) {
         RecountData recountData = countedDataList.get(position);
+        holder.id = recountData.getId();
         holder.txtCountedPlasticPlatforms.setText(recountData.getPlasticPlatforms());
         holder.txtCountedWoodenPlatforms.setText(recountData.getWoodenPlatforms());
         holder.txtCountedBoxes.setText(recountData.getBoxes());
@@ -47,7 +46,7 @@ public class CountedAdapter extends RecyclerView.Adapter<CountedAdapter.CountedV
         holder.txtCountedUser.setText(recountData.getUser());
         holder.txtCountedDate.setText(recountData.getDate());
         holder.countedLinearLayout.setOnClickListener(v -> {
-            System.out.println("cULO::: "+position);
+            Preferences.save((Activity) context, "counted_id", String.valueOf(holder.id));
         });
     }
 
@@ -64,6 +63,7 @@ public class CountedAdapter extends RecyclerView.Adapter<CountedAdapter.CountedV
         private TextView txtCountedState;
         private TextView txtCountedUser;
         private TextView txtCountedDate;
+        private int id;
         private LinearLayout countedLinearLayout;
 
         public CountedViewHolder(@NonNull View itemView) {

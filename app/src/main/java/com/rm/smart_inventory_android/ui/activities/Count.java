@@ -24,6 +24,7 @@ import com.rm.smart_inventory_android.io.ClickListener;
 import com.rm.smart_inventory_android.io.Preferences;
 import com.rm.smart_inventory_android.io.adapters.ApiRest;
 import com.rm.smart_inventory_android.io.adapters.Service;
+import com.rm.smart_inventory_android.io.db.counted.CountedDataBase;
 import com.rm.smart_inventory_android.io.models.count.CountData;
 import com.rm.smart_inventory_android.io.models.count.RecountData;
 import com.rm.smart_inventory_android.io.models.count.SendCountData;
@@ -66,6 +67,7 @@ public class Count extends AppCompatActivity implements ClickListener {
     private TextView finalLocation;
     private List<RecountData> recountDataList;
     private CountedAdapter countedAdapter;
+    private CountedDataBase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -292,7 +294,7 @@ public class Count extends AppCompatActivity implements ClickListener {
                         number2 = Double.parseDouble(chain);
                         if (number2 != 0) {
                             equals = number1 + number2;
-                            numbersBox.setText(String.valueOf(Math.round(equals*100.0)/100.0));
+                            numbersBox.setText(String.valueOf((equals)));
                             chain = String.valueOf(equals);
                             operation = "";
                             dots = 1;
@@ -304,7 +306,7 @@ public class Count extends AppCompatActivity implements ClickListener {
                         number2 = Double.parseDouble(chain);
                         if (number2 != 0) {
                             equals = number1 - number2;
-                            numbersBox.setText(String.valueOf(Math.round(equals*100.0)/100.0));
+                            numbersBox.setText(String.valueOf(equals));
                             chain = String.valueOf(equals);
                             operation = "";
                             dots = 1;
@@ -316,7 +318,7 @@ public class Count extends AppCompatActivity implements ClickListener {
                         number2 = Double.parseDouble(chain);
                         if (number2 != 0) {
                             equals = number1 * number2;
-                            numbersBox.setText(String.valueOf(Math.round(equals*100.0)/100.0));
+                            numbersBox.setText(String.valueOf(equals));
                             chain = String.valueOf(equals);
                             operation = "";
                             dots = 1;
@@ -328,7 +330,7 @@ public class Count extends AppCompatActivity implements ClickListener {
                         number2 = Double.parseDouble(chain);
                         if (number2 != 0) {
                             equals = number1 / number2;
-                            numbersBox.setText(String.valueOf(Math.round(equals*100.0)/100.0));
+                            numbersBox.setText(String.valueOf(equals));
                             chain = String.valueOf(equals);
                             operation = "";
                             dots = 1;
@@ -374,7 +376,7 @@ public class Count extends AppCompatActivity implements ClickListener {
 
                 userCall.enqueue(new Callback<SendCountData>() {
                     @Override
-                    public void onResponse(Call<SendCountData> call, Response<SendCountData> response) {
+                    public void onResponse(@NonNull Call<SendCountData> call, @NonNull Response<SendCountData> response) {
                         dialogInterface.dismiss();
                         if(response.isSuccessful()){
                             Toast.makeText(Count.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
@@ -382,9 +384,8 @@ public class Count extends AppCompatActivity implements ClickListener {
                     }
 
                     @Override
-                    public void onFailure(Call<SendCountData> call, Throwable t) {
+                    public void onFailure(@NonNull Call<SendCountData> call, @NonNull Throwable t) {
                         dialogInterface.dismiss();
-                        System.out.println("LA cagasete: "+t.getLocalizedMessage());
                         t.printStackTrace();
                         t.getMessage();
                     }
@@ -420,14 +421,14 @@ public class Count extends AppCompatActivity implements ClickListener {
 
     private void getAmountList(){
         countDataArrayList = new ArrayList<>();
-        countDataArrayList.add(new CountData("Fecha", new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date()), ""));
-        countDataArrayList.add(new CountData("Tarimas", 0, 0));
-        countDataArrayList.add(new CountData("Cajas", 0, 0));
-        countDataArrayList.add(new CountData("Unidades", 0, 0));
-        countDataArrayList.add(new CountData("Giro Palet", 0, 0));
-        countDataArrayList.add(new CountData("Separador", 0, 0));
-        countDataArrayList.add(new CountData("Marcos", 0, 0));
-        countDataArrayList.add(new CountData("Nivel", 0, 0));
+        countDataArrayList.add(new CountData("Fecha", new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date())));
+        countDataArrayList.add(new CountData("Tarimas", 0));
+        countDataArrayList.add(new CountData("Cajas", 0));
+        countDataArrayList.add(new CountData("Unidades", 0));
+        countDataArrayList.add(new CountData("Giro Palet", 0));
+        countDataArrayList.add(new CountData("Separador", 0));
+        countDataArrayList.add(new CountData("Marcos", 0));
+        countDataArrayList.add(new CountData("Nivel", 0));
 
         expirationDate = countDataArrayList.get(0).getAmount();
         platforms = countDataArrayList.get(1).getAmount();
@@ -443,6 +444,7 @@ public class Count extends AppCompatActivity implements ClickListener {
 
     private void getCountedList(){
         recountDataList = new ArrayList<>();
+        db = CountedDataBase.getInstance(Count.this);
 
         Service service = ApiRest.getInterceptedApi().create(Service.class);
         String token = Preferences.get(Count.this, "token");
@@ -452,37 +454,65 @@ public class Count extends AppCompatActivity implements ClickListener {
         Call<List<RecountData>> recountDataCall = service.getCountedData(id);
         recountDataCall.enqueue(new Callback<List<RecountData>>() {
             @Override
-            public void onResponse(Call<List<RecountData>> call, Response<List<RecountData>> response) {
+            public void onResponse(@NonNull Call<List<RecountData>> call, @NonNull Response<List<RecountData>> response) {
 
-                if (response.isSuccessful()) {
-                    String boxes = "";
-                    String units = "";
-                    String plasticPlatforms = "";
-                    String woodenPlatforms = "";
-                    String date = "";
-                    String user = "";
-                    int status = 0;
-                    if(response.body() != null){
-                        for(int i=0;i<response.body().size();i++){
-                            boxes = response.body().get(i).getBoxes();
-                            units = response.body().get(i).getUnits();
-                            plasticPlatforms = response.body().get(i).getPlasticPlatforms();
-                            woodenPlatforms = response.body().get(i).getWoodenPlatforms();
-                            date = response.body().get(i).getDate();
-                            user = response.body().get(i).getUser();
-                            status = response.body().get(i).getStatus();
+                try{
+                    if (response.isSuccessful()) {
+                        String boxes = "";
+                        String units = "";
+                        String plasticPlatforms = "";
+                        String woodenPlatforms = "";
+                        String date = "";
+                        String user = "";
+                        String statusName = "";
+                        String conversionToBoxes = "";
+                        String conversionToUnits = "";
+                        String locationResponse = "";
+                        String levelResponse = "";
+                        int status = 0;
+                        int id = 0;
+                        int articleId = 0;
+
+                        if(response.body() != null){
+                            for(int i=0;i<response.body().size();i++){
+                                boxes = response.body().get(i).getBoxes();
+                                units = response.body().get(i).getUnits();
+                                plasticPlatforms = response.body().get(i).getPlasticPlatforms();
+                                woodenPlatforms = response.body().get(i).getWoodenPlatforms();
+                                date = response.body().get(i).getDate();
+                                user = response.body().get(i).getUser();
+                                status = response.body().get(i).getStatus();
+                                id = response.body().get(i).getId();
+                                statusName = response.body().get(i).getStatusName();
+                                conversionToBoxes = response.body().get(i).getConversionToBoxes();
+                                conversionToUnits = response.body().get(i).getConversionToUnits();
+                                locationResponse = response.body().get(i).getLocation();
+                                levelResponse = response.body().get(i).getLevel();
+                                articleId = response.body().get(i).getArticleId();
+                            }
+
+                            recountDataList.add(new RecountData(id, articleId, user, boxes, units, woodenPlatforms, plasticPlatforms, levelResponse, status, statusName, conversionToBoxes, conversionToUnits, locationResponse, date));
+
+                            db.countedDao().insertList(recountDataList);
+
+                            countedAdapter = new CountedAdapter(Count.this, db.countedDao().findCountedList(Integer.parseInt(String.valueOf(intent.getIntExtra("skuId", 0)))));
+                            recountRecyclerView.setAdapter(countedAdapter);
                         }
-
-                        recountDataList.add(new RecountData(user, boxes, units, woodenPlatforms, plasticPlatforms, status, date));
-                        countedAdapter = new CountedAdapter(Count.this, recountDataList);
-                        recountRecyclerView.setAdapter(countedAdapter);
                     }
+                } catch (Exception ex){
+                    Toast.makeText(Count.this, "Ha ocurrido un error", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<List<RecountData>> call, Throwable t) {
+            public void onFailure(@NonNull Call<List<RecountData>> call, @NonNull Throwable t) {
                 t.getLocalizedMessage();
+                try{
+                    countedAdapter = new CountedAdapter(Count.this, db.countedDao().findCountedList(Integer.parseInt(String.valueOf(intent.getIntExtra("skuId", 0)))));
+                    recountRecyclerView.setAdapter(countedAdapter);
+                }catch (Exception ex){
+                    Toast.makeText(Count.this, "Ha ocurrido un error", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 

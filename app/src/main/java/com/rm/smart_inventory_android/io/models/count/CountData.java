@@ -6,9 +6,12 @@ public class CountData {
     private Object amount;
     private Object currentAmount;
 
-    public CountData(String measure, Object amount, Object currentAmount){
+    public CountData(String measure, Object amount){
         this.measure = measure;
         this.amount = amount;
+    }
+
+    public CountData(Object currentAmount){
         this.currentAmount = currentAmount;
     }
 

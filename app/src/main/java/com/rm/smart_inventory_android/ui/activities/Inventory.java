@@ -221,7 +221,6 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
                     Progress.dismissProgressBar();
                 }catch (Exception ex){
                     Progress.dismissProgressBar();
-                    System.out.println("ERROR: "+ex);
                 }
             }
 

@@ -41,7 +41,7 @@ public class CountAdapter extends RecyclerView.Adapter<CountAdapter.ViewHolder> 
         CountData countData = countDataList.get(position);
         holder.measure.setText(countData.getMeasure());
         holder.amount.setText(String.valueOf(countData.getAmount()));
-        holder.currentAmount.setText(String.valueOf(countData.getCurrentAmount()));
+        holder.currentAmount.setVisibility(View.INVISIBLE);
     }
 
     @Override
