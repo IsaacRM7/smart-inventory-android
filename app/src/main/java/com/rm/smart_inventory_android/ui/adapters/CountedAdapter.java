@@ -2,11 +2,13 @@ package com.rm.smart_inventory_android.ui.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,6 +23,8 @@ public class CountedAdapter extends RecyclerView.Adapter<CountedAdapter.CountedV
 
     private List<RecountData> countedDataList;
     private Context context;
+    private int positions[];
+    private int rowIndex = -1;
 
     public CountedAdapter(Context context, List<RecountData> countedDataList){
         this.context = context;
@@ -37,6 +41,7 @@ public class CountedAdapter extends RecyclerView.Adapter<CountedAdapter.CountedV
     @Override
     public void onBindViewHolder(@NonNull CountedViewHolder holder, int position) {
         RecountData recountData = countedDataList.get(position);
+        positions = new int[countedDataList.size()];
         holder.id = recountData.getId();
         holder.txtCountedPlasticPlatforms.setText(recountData.getPlasticPlatforms());
         holder.txtCountedWoodenPlatforms.setText(recountData.getWoodenPlatforms());
@@ -46,8 +51,19 @@ public class CountedAdapter extends RecyclerView.Adapter<CountedAdapter.CountedV
         holder.txtCountedUser.setText(recountData.getUser());
         holder.txtCountedDate.setText(recountData.getDate());
         holder.countedLinearLayout.setOnClickListener(v -> {
+            rowIndex = holder.getAdapterPosition();
+            notifyDataSetChanged();
             Preferences.save((Activity) context, "counted_id", String.valueOf(holder.id));
+            Preferences.save((Activity) context, "count_type", "2");
+            Toast.makeText(context, "Seleccionado", Toast.LENGTH_SHORT).show();
         });
+
+        if(rowIndex == position) {
+            holder.countedLinearLayout.setBackgroundColor(Color.parseColor("#D5C5C8"));
+        }
+        else{
+            holder.countedLinearLayout.setBackgroundColor(Color.parseColor("#FFFFFF"));
+        }
     }
 
     @Override

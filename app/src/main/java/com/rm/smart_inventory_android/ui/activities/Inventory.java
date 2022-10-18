@@ -246,6 +246,12 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //deleteInvetory();
+    }
+
+    @Override
     public void onClick(int position) {
         String skuName = inventoryAdapter.getFilteredList().get(position).getSkuName();
         String sku = inventoryAdapter.getFilteredList().get(position).getSku();

@@ -11,10 +11,10 @@ public class Preferences {
     public static SharedPreferences sharedPreferences;
     public static String preferences = "SMART";
 
-    public static void save(Activity activity, String key, String valor) {
+    public static void save(Activity activity, String key, String value) {
         sharedPreferences = activity.getSharedPreferences(preferences, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(key, valor);
+        editor.putString(key, value);
         editor.apply();
     }
 
@@ -23,10 +23,10 @@ public class Preferences {
         return sharedPreferences.getString(key, "");
     }
 
-    public static void saveList(Activity activity, String key, List<String> valor) {
+    public static void saveList(Activity activity, String key, List<String> value) {
         sharedPreferences = activity.getSharedPreferences(preferences, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(key, String.valueOf(valor));
+        editor.putString(key, String.valueOf(value));
         editor.apply();
     }
 
@@ -35,10 +35,10 @@ public class Preferences {
         return sharedPreferences.getString(key, "");
     }
 
-    public static void saveIntList(Activity activity, String key, List<Integer> valor) {
+    public static void saveIntList(Activity activity, String key, List<Integer> value) {
         sharedPreferences = activity.getSharedPreferences(preferences, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(key, String.valueOf(valor));
+        editor.putString(key, String.valueOf(value));
         editor.apply();
     }
 

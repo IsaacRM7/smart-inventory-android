@@ -57,11 +57,12 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.View
             holder.circleImage.setColorFilter(Color.parseColor("#00FF00"));
         }
 
+        double difference = inventoryData.getTheoretical() - inventoryData.getPhysical();
         holder.sku.setText(inventoryData.getSku());
         holder.skuName.setText(inventoryData.getSkuName());
-        holder.theoretical.setText(String.valueOf(inventoryData.getTheoretical()));
-        holder.physical.setText(String.valueOf(inventoryData.getPhysical()));
-        holder.difference.setText(String.valueOf(inventoryData.getTheoretical() - inventoryData.getPhysical()));
+        holder.theoretical.setText("Téorico: "+inventoryData.getTheoretical());
+        holder.physical.setText(String.valueOf("Físico: "+inventoryData.getPhysical()));
+        holder.difference.setText(String.valueOf("Diferencia: "+difference));
     }
 
     @Override

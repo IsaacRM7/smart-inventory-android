@@ -25,6 +25,8 @@ import com.rm.smart_inventory_android.io.Preferences;
 import com.rm.smart_inventory_android.io.adapters.ApiRest;
 import com.rm.smart_inventory_android.io.adapters.Service;
 import com.rm.smart_inventory_android.io.db.counted.CountedDataBase;
+import com.rm.smart_inventory_android.io.db.sendcount.SendCountDataBase;
+import com.rm.smart_inventory_android.io.db.sendcount.SendCountEntity;
 import com.rm.smart_inventory_android.io.models.count.CountData;
 import com.rm.smart_inventory_android.io.models.count.RecountData;
 import com.rm.smart_inventory_android.io.models.count.SendCountData;
@@ -53,7 +55,8 @@ public class Count extends AppCompatActivity implements ClickListener {
     private int dots = 0;
     private double equals;
     private double number1;
-    private Object platforms;
+    private Object woodenPlatform;
+    private Object plasticPlatform;
     private Object boxes;
     private Object units;
     private Object giroPallet;
@@ -66,17 +69,22 @@ public class Count extends AppCompatActivity implements ClickListener {
     private Intent intent;
     private TextView finalLocation;
     private List<RecountData> recountDataList;
+    private List<SendCountEntity> sendCountEntityList;
     private CountedAdapter countedAdapter;
-    private CountedDataBase db;
+    private CountedDataBase dbCounted;
+    private SendCountDataBase dbSendCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_count);
+        dbSendCount = SendCountDataBase.getInstance(Count.this);
 
         recountRecyclerView = findViewById(R.id.recycler_view_recounted);
         recountRecyclerView.setHasFixedSize(true);
         recountRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        Preferences.save(Count.this, "counted_id", "0");
+        Preferences.save(Count.this, "count_type", "1");
         TextView sku = findViewById(R.id.txt_sku_count);
         TextView skuName = findViewById(R.id.txt_sku_name_count);
         TextView skuFamily = findViewById(R.id.txt_family_count);
@@ -99,6 +107,7 @@ public class Count extends AppCompatActivity implements ClickListener {
         Button bTimes = findViewById(R.id.times_button);
         Button bDivide = findViewById(R.id.divide_button);
         FloatingActionButton fab = findViewById(R.id.send_data_fab);
+        System.out.println("ÑÑ: "+dbSendCount.countedDao().getAll());
 
         numbersBox = findViewById(R.id.txt_numbers);
 
@@ -345,6 +354,7 @@ public class Count extends AppCompatActivity implements ClickListener {
         location.setOnClickListener(view -> LocationDialog.openQuestion(getResources().getString(R.string.app_name), "Ingrese su ubicación", Count.this, (i, response) -> finalLocation.setText(response)));
 
         fab.setOnClickListener(view -> {
+            sendCountEntityList = new ArrayList<>();
             final String chain = Preferences.get(Count.this, "stateList");
             final String[] states = chain.substring(1, chain.length() - 1).split(", ");
             final String chainId = Preferences.get(Count.this, "stateIdList");
@@ -358,19 +368,25 @@ public class Count extends AppCompatActivity implements ClickListener {
                 String token = Preferences.get(Count.this, "token");
                 ApiRest.TOKEN = token;
 
-                params.put("article_id", intent.getIntExtra("skuId", 0));
-                params.put("counted_article_id", 0);
+                String countedArticleId = Preferences.get(Count.this, "counted_id");
+                String countType = Preferences.get(Count.this, "count_type");
+                int articleId = intent.getIntExtra("skuId", 0);
+
+                params.put("article_id", articleId);
+                params.put("counted_article_id", countedArticleId);
                 params.put("material_status_id", statesId[i]);
-                params.put("wooden_platforms", platforms);
-                params.put("plastic_platforms", 0);
+                params.put("wooden_platforms", woodenPlatform);
+                params.put("plastic_platforms", plasticPlatform);
                 params.put("boxes", boxes);
                 params.put("units", units);
                 params.put("frames", squares);
+                params.put("separator", separator);
                 params.put("giro_paleta", giroPallet);
-                params.put("location", finalLocation.getText());
+                params.put("location", finalLocation.getText().toString());
                 params.put("expiration_date", expirationDate);
-                params.put("type_count", 1);
+                params.put("type_count", countType);
                 params.put("level", level);
+                sendCountEntityList.add(new SendCountEntity(countedArticleId, articleId, finalLocation.getText().toString(), countType, statesId[i], expirationDate.toString(), woodenPlatform.toString(), plasticPlatform.toString(), boxes.toString(), units.toString(), giroPallet.toString(), separator.toString(), squares.toString(), level.toString()));
 
                 Call<SendCountData> userCall = service.sendCount(params);
 
@@ -386,11 +402,13 @@ public class Count extends AppCompatActivity implements ClickListener {
                     @Override
                     public void onFailure(@NonNull Call<SendCountData> call, @NonNull Throwable t) {
                         dialogInterface.dismiss();
+                        dbSendCount.countedDao().insertList(sendCountEntityList);
                         t.printStackTrace();
                         t.getMessage();
                     }
                 });
 
+                Preferences.delete(Count.this, "counted_id");
                 Intent intent = new Intent(Count.this, Inventory.class);
                 startActivity(intent);
                 finish();
@@ -422,7 +440,8 @@ public class Count extends AppCompatActivity implements ClickListener {
     private void getAmountList(){
         countDataArrayList = new ArrayList<>();
         countDataArrayList.add(new CountData("Fecha", new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date())));
-        countDataArrayList.add(new CountData("Tarimas", 0));
+        countDataArrayList.add(new CountData("Tarimas Madera", 0));
+        countDataArrayList.add(new CountData("Tarimas Plasticas", 0));
         countDataArrayList.add(new CountData("Cajas", 0));
         countDataArrayList.add(new CountData("Unidades", 0));
         countDataArrayList.add(new CountData("Giro Palet", 0));
@@ -431,20 +450,21 @@ public class Count extends AppCompatActivity implements ClickListener {
         countDataArrayList.add(new CountData("Nivel", 0));
 
         expirationDate = countDataArrayList.get(0).getAmount();
-        platforms = countDataArrayList.get(1).getAmount();
-        boxes = countDataArrayList.get(2).getAmount();
-        units = countDataArrayList.get(3).getAmount();
-        giroPallet = countDataArrayList.get(4).getAmount();
-        separator = countDataArrayList.get(5).getAmount();
-        squares = countDataArrayList.get(6).getAmount();
-        level = countDataArrayList.get(7).getAmount();
+        woodenPlatform = countDataArrayList.get(1).getAmount();
+        plasticPlatform = countDataArrayList.get(2).getAmount();
+        boxes = countDataArrayList.get(3).getAmount();
+        units = countDataArrayList.get(4).getAmount();
+        giroPallet = countDataArrayList.get(5).getAmount();
+        separator = countDataArrayList.get(6).getAmount();
+        squares = countDataArrayList.get(7).getAmount();
+        level = countDataArrayList.get(8).getAmount();
 
         countAdapter.addList(countDataArrayList);
     }
 
     private void getCountedList(){
         recountDataList = new ArrayList<>();
-        db = CountedDataBase.getInstance(Count.this);
+        dbCounted = CountedDataBase.getInstance(Count.this);
 
         Service service = ApiRest.getInterceptedApi().create(Service.class);
         String token = Preferences.get(Count.this, "token");
@@ -493,9 +513,9 @@ public class Count extends AppCompatActivity implements ClickListener {
 
                             recountDataList.add(new RecountData(id, articleId, user, boxes, units, woodenPlatforms, plasticPlatforms, levelResponse, status, statusName, conversionToBoxes, conversionToUnits, locationResponse, date));
 
-                            db.countedDao().insertList(recountDataList);
+                            dbCounted.countedDao().insertList(recountDataList);
 
-                            countedAdapter = new CountedAdapter(Count.this, db.countedDao().findCountedList(Integer.parseInt(String.valueOf(intent.getIntExtra("skuId", 0)))));
+                            countedAdapter = new CountedAdapter(Count.this, dbCounted.countedDao().findCountedList(Integer.parseInt(String.valueOf(intent.getIntExtra("skuId", 0)))));
                             recountRecyclerView.setAdapter(countedAdapter);
                         }
                     }
@@ -508,7 +528,7 @@ public class Count extends AppCompatActivity implements ClickListener {
             public void onFailure(@NonNull Call<List<RecountData>> call, @NonNull Throwable t) {
                 t.getLocalizedMessage();
                 try{
-                    countedAdapter = new CountedAdapter(Count.this, db.countedDao().findCountedList(Integer.parseInt(String.valueOf(intent.getIntExtra("skuId", 0)))));
+                    countedAdapter = new CountedAdapter(Count.this, dbCounted.countedDao().findCountedList(Integer.parseInt(String.valueOf(intent.getIntExtra("skuId", 0)))));
                     recountRecyclerView.setAdapter(countedAdapter);
                 }catch (Exception ex){
                     Toast.makeText(Count.this, "Ha ocurrido un error", Toast.LENGTH_SHORT).show();
@@ -556,13 +576,14 @@ public class Count extends AppCompatActivity implements ClickListener {
                 String amountCalculator = chain;
                 double number = Double.parseDouble(amountCalculator);
                 countDataArrayList.get(position).setAmount(number);
-                platforms = countDataArrayList.get(1).getAmount();
-                boxes = countDataArrayList.get(2).getAmount();
-                units = countDataArrayList.get(3).getAmount();
-                giroPallet = countDataArrayList.get(4).getAmount();
-                separator = countDataArrayList.get(5).getAmount();
-                squares = countDataArrayList.get(6).getAmount();
-                level = countDataArrayList.get(7).getAmount();
+                woodenPlatform = countDataArrayList.get(1).getAmount();
+                plasticPlatform = countDataArrayList.get(2).getAmount();
+                boxes = countDataArrayList.get(3).getAmount();
+                units = countDataArrayList.get(4).getAmount();
+                giroPallet = countDataArrayList.get(5).getAmount();
+                separator = countDataArrayList.get(6).getAmount();
+                squares = countDataArrayList.get(7).getAmount();
+                level = countDataArrayList.get(8).getAmount();
 
                 countAdapter.notifyItemChanged(position);
                 numbersBox.setText("");
