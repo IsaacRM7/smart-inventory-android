@@ -15,8 +15,14 @@
         android:usesCleartextTraffic="true">
         <activity
             android:name=".ui.activities.Splash"
-            android:exported="false"
-            android:screenOrientation="landscape" />
+            android:exported="true"
+            android:screenOrientation="landscape" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".ui.activities.Inventory"
             android:exported="false"
@@ -33,11 +39,6 @@
             android:name=".ui.activities.Login"
             android:exported="true"
             android:screenOrientation="landscape">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
     </application>
 

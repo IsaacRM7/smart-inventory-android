@@ -508,9 +508,9 @@ public class Count extends AppCompatActivity implements ClickListener {
                                 locationResponse = response.body().get(i).getLocation();
                                 levelResponse = response.body().get(i).getLevel();
                                 articleId = response.body().get(i).getArticleId();
-                            }
 
-                            recountDataList.add(new RecountData(id, articleId, user, boxes, units, woodenPlatforms, plasticPlatforms, levelResponse, status, statusName, conversionToBoxes, conversionToUnits, locationResponse, date));
+                                recountDataList.add(new RecountData(id, articleId, user, boxes, units, woodenPlatforms, plasticPlatforms, levelResponse, status, statusName, conversionToBoxes, conversionToUnits, locationResponse, date));
+                            }
 
                             dbCounted.countedDao().insertList(recountDataList);
 

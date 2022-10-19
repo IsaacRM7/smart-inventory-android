@@ -21,9 +21,10 @@ import com.rm.smart_inventory_android.io.ClickListener;
 import com.rm.smart_inventory_android.io.Preferences;
 import com.rm.smart_inventory_android.io.adapters.ApiRest;
 import com.rm.smart_inventory_android.io.adapters.Service;
+import com.rm.smart_inventory_android.io.db.centers.CenterDataBase;
+import com.rm.smart_inventory_android.io.db.counted.CountedDataBase;
 import com.rm.smart_inventory_android.io.db.inventroy.InventoryDataBase;
 import com.rm.smart_inventory_android.io.db.sendcount.SendCountDataBase;
-import com.rm.smart_inventory_android.io.db.sendcount.SendCountEntity;
 import com.rm.smart_inventory_android.io.models.count.SendCountData;
 import com.rm.smart_inventory_android.io.models.inventory.InventoryData;
 import com.rm.smart_inventory_android.io.models.inventory.InventoryRoot;
@@ -46,6 +47,8 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
     private List<InventoryData> inventoryDataList;
     private InventoryDataBase dbInventory;
     private SendCountDataBase dbSendCount;
+    private CenterDataBase dbCenter;
+    private CountedDataBase dbCounted;
 
     @SuppressLint("NonConstantResourceId")
     @Override
@@ -54,6 +57,8 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
         setContentView(R.layout.activity_inventory);
         dbInventory = InventoryDataBase.getInstance(Inventory.this);
         dbSendCount = SendCountDataBase.getInstance(Inventory.this);
+        dbCenter = CenterDataBase.getInstance(Inventory.this);
+        dbCounted = CountedDataBase.getInstance(Inventory.this);
 
         LinearLayoutManager linearLayout = new LinearLayoutManager(this);
 
@@ -93,7 +98,6 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
 
                 case R.id.sync:
                     syncData();
-                    //System.out.println("D.va culo: "+dbSendCount.countedDao().getAll().size());
                     return false;
 
                 default:
@@ -145,6 +149,10 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
                     Preferences.delete(Inventory.this, "token");
                     Preferences.delete(Inventory.this, "warehouse_id");
                     Toast.makeText(Inventory.this, message, Toast.LENGTH_SHORT).show();
+                    dbSendCount.clearAllTables();
+                    dbInventory.clearAllTables();
+                    dbCenter.clearAllTables();
+                    dbCounted.clearAllTables();
                     Intent intent = new Intent(Inventory.this, Login.class);
                     startActivity(intent);
                     finish();
@@ -247,42 +255,53 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
         String token = Preferences.get(Inventory.this, "token");
         ApiRest.TOKEN = token;
 
-        for(int i=0;i<dbSendCount.countedDao().getAll().size(); i++){
-            params.put("article_id", dbSendCount.countedDao().getAll().get(i).getArticleId());
-            params.put("counted_article_id", dbSendCount.countedDao().getAll().get(i).getCountedArticleId());
-            params.put("material_status_id", dbSendCount.countedDao().getAll().get(i).getMaterialId());
-            params.put("wooden_platforms", dbSendCount.countedDao().getAll().get(i).getWoodenPlatform());
-            params.put("plastic_platforms", dbSendCount.countedDao().getAll().get(i).getPlasticPlatform());
-            params.put("boxes", dbSendCount.countedDao().getAll().get(i).getBoxes());
-            params.put("units", dbSendCount.countedDao().getAll().get(i).getUnits());
-            params.put("frames", dbSendCount.countedDao().getAll().get(i).getSquares());
-            params.put("separator", dbSendCount.countedDao().getAll().get(i).getSeparator());
-            params.put("giro_paleta", dbSendCount.countedDao().getAll().get(i).getGiroPallet());
-            params.put("location", dbSendCount.countedDao().getAll().get(i).getLocation());
-            params.put("expiration_date", dbSendCount.countedDao().getAll().get(i).getDate());
-            params.put("type_count", dbSendCount.countedDao().getAll().get(i).getTypeCount());
-            params.put("level", dbSendCount.countedDao().getAll().get(i).getLevel());
+        if(dbSendCount.countedDao().getAll().size() != 0){
+            for(int i=0;i<dbSendCount.countedDao().getAll().size(); i++){
+                params.put("article_id", dbSendCount.countedDao().getAll().get(i).getArticleId());
+                params.put("counted_article_id", dbSendCount.countedDao().getAll().get(i).getCountedArticleId());
+                params.put("material_status_id", dbSendCount.countedDao().getAll().get(i).getMaterialId());
+                params.put("wooden_platforms", dbSendCount.countedDao().getAll().get(i).getWoodenPlatform());
+                params.put("plastic_platforms", dbSendCount.countedDao().getAll().get(i).getPlasticPlatform());
+                params.put("boxes", dbSendCount.countedDao().getAll().get(i).getBoxes());
+                params.put("units", dbSendCount.countedDao().getAll().get(i).getUnits());
+                params.put("frames", dbSendCount.countedDao().getAll().get(i).getSquares());
+                params.put("separator", dbSendCount.countedDao().getAll().get(i).getSeparator());
+                params.put("giro_paleta", dbSendCount.countedDao().getAll().get(i).getGiroPallet());
+                params.put("location", dbSendCount.countedDao().getAll().get(i).getLocation());
+                params.put("expiration_date", dbSendCount.countedDao().getAll().get(i).getDate());
+                params.put("type_count", dbSendCount.countedDao().getAll().get(i).getTypeCount());
+                params.put("level", dbSendCount.countedDao().getAll().get(i).getLevel());
 
-            Call<SendCountData> userCall = service.sendCount(params);
+                Call<SendCountData> userCall = service.sendCount(params);
 
-            userCall.enqueue(new Callback<SendCountData>() {
-                @Override
-                public void onResponse(@NonNull Call<SendCountData> call, @NonNull Response<SendCountData> response) {
-                    if(response.isSuccessful()){
-                        assert response.body() != null;
-                        Toast.makeText(Inventory.this, "Sincronización 1: "+ response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                int finalI = i+1;
+                userCall.enqueue(new Callback<SendCountData>() {
+                    @Override
+                    public void onResponse(@NonNull Call<SendCountData> call, @NonNull Response<SendCountData> response) {
+                        if(response.isSuccessful()){
+                            assert response.body() != null;
+                            Toast.makeText(Inventory.this, "Sincronización "+finalI+": "+ response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                            if(dbSendCount.countedDao().getAll().size() >= finalI){
+                                dbSendCount.clearAllTables();
+                            }
+                        }
+                        else{
+                            Toast.makeText(Inventory.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                        }
                     }
-                }
 
-                @Override
-                public void onFailure(@NonNull Call<SendCountData> call, @NonNull Throwable t) {
-                    t.printStackTrace();
-                    t.getMessage();
-                }
-            });
+                    @Override
+                    public void onFailure(@NonNull Call<SendCountData> call, @NonNull Throwable t) {
+                        t.printStackTrace();
+                        t.getMessage();
+                    }
+                });
+            }
+        }
+        else{
+            Toast.makeText(this, "Sin datos para sincronizar", Toast.LENGTH_SHORT).show();
         }
 
-        dbSendCount.clearAllTables();
         Progress.dismissProgressDialog(Inventory.this);
     }
 
