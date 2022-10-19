@@ -8,7 +8,10 @@ import androidx.room.PrimaryKey;
 @Entity
 public class SendCountEntity {
 
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
+    @NonNull
+    private int id;
+
     @ColumnInfo(name = "counted_article_id")
     @NonNull
     private String countedArticleId;
@@ -67,6 +70,14 @@ public class SendCountEntity {
         this.separator = separator;
         this.squares = squares;
         this.level = level;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getWoodenPlatform() {

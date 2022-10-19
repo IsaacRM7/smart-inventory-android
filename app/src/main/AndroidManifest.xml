@@ -11,20 +11,28 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:usesCleartextTraffic="true"
-        android:theme="@style/Theme.Smartinventoryandroid">
+        android:theme="@style/Theme.Smartinventoryandroid"
+        android:usesCleartextTraffic="true">
+        <activity
+            android:name=".ui.activities.Splash"
+            android:exported="false"
+            android:screenOrientation="landscape" />
         <activity
             android:name=".ui.activities.Inventory"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="landscape" />
         <activity
             android:name=".ui.activities.Count"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="landscape" />
         <activity
             android:name=".ui.activities.Center"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="landscape" />
         <activity
             android:name=".ui.activities.Login"
-            android:exported="true">
+            android:exported="true"
+            android:screenOrientation="landscape">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

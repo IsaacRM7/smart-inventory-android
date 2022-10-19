@@ -107,7 +107,6 @@ public class Count extends AppCompatActivity implements ClickListener {
         Button bTimes = findViewById(R.id.times_button);
         Button bDivide = findViewById(R.id.divide_button);
         FloatingActionButton fab = findViewById(R.id.send_data_fab);
-        System.out.println("ÑÑ: "+dbSendCount.countedDao().getAll());
 
         numbersBox = findViewById(R.id.txt_numbers);
 

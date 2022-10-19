@@ -22,6 +22,9 @@ import com.rm.smart_inventory_android.io.Preferences;
 import com.rm.smart_inventory_android.io.adapters.ApiRest;
 import com.rm.smart_inventory_android.io.adapters.Service;
 import com.rm.smart_inventory_android.io.db.inventroy.InventoryDataBase;
+import com.rm.smart_inventory_android.io.db.sendcount.SendCountDataBase;
+import com.rm.smart_inventory_android.io.db.sendcount.SendCountEntity;
+import com.rm.smart_inventory_android.io.models.count.SendCountData;
 import com.rm.smart_inventory_android.io.models.inventory.InventoryData;
 import com.rm.smart_inventory_android.io.models.inventory.InventoryRoot;
 import com.rm.smart_inventory_android.io.models.login.UserRoot;
@@ -41,14 +44,16 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
 
     private InventoryAdapter inventoryAdapter;
     private List<InventoryData> inventoryDataList;
-    private InventoryDataBase db;
+    private InventoryDataBase dbInventory;
+    private SendCountDataBase dbSendCount;
 
     @SuppressLint("NonConstantResourceId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inventory);
-        db = InventoryDataBase.getInstance(Inventory.this);
+        dbInventory = InventoryDataBase.getInstance(Inventory.this);
+        dbSendCount = SendCountDataBase.getInstance(Inventory.this);
 
         LinearLayoutManager linearLayout = new LinearLayoutManager(this);
 
@@ -87,7 +92,8 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
                     return false;
 
                 case R.id.sync:
-                    Toast.makeText(this, "Botón sincronizar", Toast.LENGTH_SHORT).show();
+                    syncData();
+                    //System.out.println("D.va culo: "+dbSendCount.countedDao().getAll().size());
                     return false;
 
                 default:
@@ -211,8 +217,8 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
                         if(inventoryRoot.getResult()){
                             inventoryDataList = inventoryRoot.getData();
 
-                            db.inventoryDao().insertList(inventoryDataList);
-                            inventoryAdapter.addList((ArrayList<InventoryData>) db.inventoryDao().getAll());
+                            dbInventory.inventoryDao().insertList(inventoryDataList);
+                            inventoryAdapter.addList((ArrayList<InventoryData>) dbInventory.inventoryDao().getAll());
                         }
                         else{
                             Toast.makeText(Inventory.this, inventoryRoot.getMessage(), Toast.LENGTH_SHORT).show();
@@ -227,13 +233,61 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
             @Override
             public void onFailure(@NonNull Call<InventoryRoot> call, @NonNull Throwable t) {
                 Progress.dismissProgressBar();
-                inventoryAdapter.addList((ArrayList<InventoryData>) db.inventoryDao().getAll());
+                inventoryAdapter.addList((ArrayList<InventoryData>) dbInventory.inventoryDao().getAll());
             }
         });
     }
 
+    private void syncData(){
+        Progress.showProgressDialog(Inventory.this);
+        dbSendCount.countedDao().getAll();
+
+        Service service = ApiRest.getInterceptedApi().create(Service.class);
+        HashMap<String, Object> params = new HashMap<>();
+        String token = Preferences.get(Inventory.this, "token");
+        ApiRest.TOKEN = token;
+
+        for(int i=0;i<dbSendCount.countedDao().getAll().size(); i++){
+            params.put("article_id", dbSendCount.countedDao().getAll().get(i).getArticleId());
+            params.put("counted_article_id", dbSendCount.countedDao().getAll().get(i).getCountedArticleId());
+            params.put("material_status_id", dbSendCount.countedDao().getAll().get(i).getMaterialId());
+            params.put("wooden_platforms", dbSendCount.countedDao().getAll().get(i).getWoodenPlatform());
+            params.put("plastic_platforms", dbSendCount.countedDao().getAll().get(i).getPlasticPlatform());
+            params.put("boxes", dbSendCount.countedDao().getAll().get(i).getBoxes());
+            params.put("units", dbSendCount.countedDao().getAll().get(i).getUnits());
+            params.put("frames", dbSendCount.countedDao().getAll().get(i).getSquares());
+            params.put("separator", dbSendCount.countedDao().getAll().get(i).getSeparator());
+            params.put("giro_paleta", dbSendCount.countedDao().getAll().get(i).getGiroPallet());
+            params.put("location", dbSendCount.countedDao().getAll().get(i).getLocation());
+            params.put("expiration_date", dbSendCount.countedDao().getAll().get(i).getDate());
+            params.put("type_count", dbSendCount.countedDao().getAll().get(i).getTypeCount());
+            params.put("level", dbSendCount.countedDao().getAll().get(i).getLevel());
+
+            Call<SendCountData> userCall = service.sendCount(params);
+
+            userCall.enqueue(new Callback<SendCountData>() {
+                @Override
+                public void onResponse(@NonNull Call<SendCountData> call, @NonNull Response<SendCountData> response) {
+                    if(response.isSuccessful()){
+                        assert response.body() != null;
+                        Toast.makeText(Inventory.this, "Sincronización 1: "+ response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<SendCountData> call, @NonNull Throwable t) {
+                    t.printStackTrace();
+                    t.getMessage();
+                }
+            });
+        }
+
+        dbSendCount.clearAllTables();
+        Progress.dismissProgressDialog(Inventory.this);
+    }
+
     public void deleteInvetory(){
-        db.clearAllTables();
+        dbInventory.clearAllTables();
     }
 
     @Override
@@ -269,7 +323,7 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        db.inventoryDao().findBySku(query);
+        dbInventory.inventoryDao().findBySku(query);
         return false;
     }
 
