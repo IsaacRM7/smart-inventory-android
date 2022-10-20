@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.rm.smart_inventory_android.R;
 import com.rm.smart_inventory_android.io.ClickListener;
+import com.rm.smart_inventory_android.io.Preferences;
 import com.rm.smart_inventory_android.io.db.inventroy.InventoryDataBase;
 import com.rm.smart_inventory_android.io.models.inventory.InventoryData;
 
@@ -25,7 +26,7 @@ import java.util.List;
 public class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.ViewHolder> implements Filterable {
 
     private Context context;
-    private final List<InventoryData> inventoryDataList;
+    private List<InventoryData> inventoryDataList;
     private InventoryDataBase db;
     private final ClickListener listener;
 
@@ -56,13 +57,21 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.View
         else{
             holder.circleImage.setColorFilter(Color.parseColor("#00FF00"));
         }
-
-        double difference = inventoryData.getTheoretical() - inventoryData.getPhysical();
-        holder.sku.setText(inventoryData.getSku());
-        holder.skuName.setText(inventoryData.getSkuName());
-        holder.theoretical.setText("Téorico: "+inventoryData.getTheoretical());
-        holder.physical.setText(String.valueOf("Físico: "+inventoryData.getPhysical()));
-        holder.difference.setText(String.valueOf("Diferencia: "+difference));
+        if(Preferences.get(context, "user_type").equals("1")){
+            double difference = inventoryData.getTheoretical() - inventoryData.getPhysical();
+            holder.sku.setText(inventoryData.getSku());
+            holder.skuName.setText(inventoryData.getSkuName());
+            holder.theoretical.setText("Téorico: "+inventoryData.getTheoretical());
+            holder.physical.setText(String.valueOf("Físico: "+inventoryData.getPhysical()));
+            holder.difference.setText(String.valueOf("Diferencia: "+difference));
+        }
+        else{
+            holder.sku.setText(inventoryData.getSku());
+            holder.skuName.setText(inventoryData.getSkuName());
+            holder.theoretical.setVisibility(View.GONE);
+            holder.physical.setVisibility(View.GONE);
+            holder.difference.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -72,7 +81,7 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.View
 
     @SuppressLint("NotifyDataSetChanged")
     public void addList(ArrayList<InventoryData> list){
-        inventoryDataList.addAll(list);
+        this.inventoryDataList = list;
         notifyDataSetChanged();
     }
 

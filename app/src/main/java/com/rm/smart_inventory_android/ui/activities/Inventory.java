@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -70,6 +71,10 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
 
         NavigationView navigationView = findViewById(R.id.navigation_view);
 
+        if(this.getSupportActionBar() != null){
+            ((AppCompatActivity) this ).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
         SearchView searchView = findViewById(R.id.searchview);
         searchView.setOnQueryTextListener(this);
         searchView.setQueryHint("Buscar SKU");
@@ -111,6 +116,15 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
     }
 
     @Override
+    public boolean onSupportNavigateUp() {
+        Intent intent = new Intent(Inventory.this, Center.class);
+        deleteInvetory();
+        startActivity(intent);
+        finish();
+        return super.onSupportNavigateUp();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.toolbar_menu, menu);
         return super.onCreateOptionsMenu(menu);
@@ -139,23 +153,33 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
             @Override
             public void onResponse(@NonNull Call<UserRoot> call, @NonNull Response<UserRoot> response) {
 
-                if(response.isSuccessful()) {
-                    assert response.body() != null;
-                    String message = response.body().getMessage();
-                    Preferences.delete(Inventory.this, "user_id");
-                    Preferences.delete(Inventory.this, "user");
-                    Preferences.delete(Inventory.this, "password");
-                    Preferences.delete(Inventory.this, "id_count_assigned");
-                    Preferences.delete(Inventory.this, "token");
-                    Preferences.delete(Inventory.this, "warehouse_id");
-                    Toast.makeText(Inventory.this, message, Toast.LENGTH_SHORT).show();
-                    dbSendCount.clearAllTables();
-                    dbInventory.clearAllTables();
-                    dbCenter.clearAllTables();
-                    dbCounted.clearAllTables();
-                    Intent intent = new Intent(Inventory.this, Login.class);
-                    startActivity(intent);
-                    finish();
+                try{
+                    if(response.isSuccessful()) {
+                        assert response.body() != null;
+                        String message = response.body().getMessage();
+                        Preferences.delete(Inventory.this, "user_id");
+                        Preferences.delete(Inventory.this, "user");
+                        Preferences.delete(Inventory.this, "password");
+                        Preferences.delete(Inventory.this, "id_count_assigned");
+                        Preferences.delete(Inventory.this, "token");
+                        Preferences.delete(Inventory.this, "warehouse_id");
+                        Preferences.delete(Inventory.this, "stateIdList");
+                        Preferences.delete(Inventory.this, "stateList");
+                        Preferences.delete(Inventory.this, "user_type");
+                        Toast.makeText(Inventory.this, message, Toast.LENGTH_SHORT).show();
+                        dbSendCount.clearAllTables();
+                        dbInventory.clearAllTables();
+                        dbCenter.clearAllTables();
+                        dbCounted.clearAllTables();
+                        Intent intent = new Intent(Inventory.this, Login.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                    else{
+                        Toast.makeText(Inventory.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }catch (Exception ex){
+                    Toast.makeText(Inventory.this, "Ocurrió un error", Toast.LENGTH_SHORT).show();
                 }
 
                 Progress.dismissProgressDialog(Inventory.this);
@@ -246,6 +270,12 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getInventory();
+    }
+
     private void syncData(){
         Progress.showProgressDialog(Inventory.this);
         dbSendCount.countedDao().getAll();
@@ -275,18 +305,25 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
                 Call<SendCountData> userCall = service.sendCount(params);
 
                 int finalI = i+1;
+                int finalI1 = i;
                 userCall.enqueue(new Callback<SendCountData>() {
                     @Override
                     public void onResponse(@NonNull Call<SendCountData> call, @NonNull Response<SendCountData> response) {
-                        if(response.isSuccessful()){
-                            assert response.body() != null;
-                            Toast.makeText(Inventory.this, "Sincronización "+finalI+": "+ response.body().getMessage(), Toast.LENGTH_SHORT).show();
-                            if(dbSendCount.countedDao().getAll().size() >= finalI){
-                                dbSendCount.clearAllTables();
+
+                        try{
+                            if(response.isSuccessful()){
+                                assert response.body() != null;
+                                Toast.makeText(Inventory.this, "Sincronización "+finalI+": "+ response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                                if(dbSendCount.countedDao().getAll().size() >= finalI1){
+                                    dbSendCount.clearAllTables();
+                                    getInventory();
+                                }
                             }
-                        }
-                        else{
-                            Toast.makeText(Inventory.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                            else{
+                                Toast.makeText(Inventory.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        }catch (Exception ex){
+                            Toast.makeText(Inventory.this, "Error al sincronizar", Toast.LENGTH_SHORT).show();
                         }
                     }
 
@@ -321,7 +358,7 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //deleteInvetory();
+        deleteInvetory();
     }
 
     @Override
@@ -337,7 +374,6 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
         intent.putExtra("skuFamily", skuFamily);
         intent.putExtra("skuId", id);
         startActivity(intent);
-        finish();
     }
 
     @Override

@@ -41,6 +41,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -126,6 +127,10 @@ public class Count extends AppCompatActivity implements ClickListener {
         recyclerView.setLayoutManager(linearLayoutManagerSkuList);
         recyclerView.setAdapter(countAdapter);
         getAmountList();
+
+        if(this.getSupportActionBar() != null){
+            Objects.requireNonNull(((AppCompatActivity) this).getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        }
 
         b0.setOnClickListener(v -> {
             if(!chain.equals("")){
@@ -402,14 +407,13 @@ public class Count extends AppCompatActivity implements ClickListener {
                     public void onFailure(@NonNull Call<SendCountData> call, @NonNull Throwable t) {
                         dialogInterface.dismiss();
                         dbSendCount.countedDao().insertList(sendCountEntityList);
+                        Toast.makeText(Count.this, "Conteo guardado para sincronización", Toast.LENGTH_SHORT).show();
                         t.printStackTrace();
                         t.getMessage();
                     }
                 });
 
                 Preferences.delete(Count.this, "counted_id");
-                Intent intent = new Intent(Count.this, Inventory.class);
-                startActivity(intent);
                 finish();
 
             }).show();
@@ -418,6 +422,12 @@ public class Count extends AppCompatActivity implements ClickListener {
 
         getCountedList();
 
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return super.onSupportNavigateUp();
     }
 
     @Override
@@ -477,20 +487,20 @@ public class Count extends AppCompatActivity implements ClickListener {
 
                 try{
                     if (response.isSuccessful()) {
-                        String boxes = "";
-                        String units = "";
-                        String plasticPlatforms = "";
-                        String woodenPlatforms = "";
-                        String date = "";
-                        String user = "";
-                        String statusName = "";
-                        String conversionToBoxes = "";
-                        String conversionToUnits = "";
-                        String locationResponse = "";
-                        String levelResponse = "";
-                        int status = 0;
-                        int id = 0;
-                        int articleId = 0;
+                        String boxes;
+                        String units;
+                        String plasticPlatforms;
+                        String woodenPlatforms;
+                        String date;
+                        String user;
+                        String statusName;
+                        String conversionToBoxes;
+                        String conversionToUnits;
+                        String locationResponse;
+                        String levelResponse;
+                        int status;
+                        int id;
+                        int articleId;
 
                         if(response.body() != null){
                             for(int i=0;i<response.body().size();i++){

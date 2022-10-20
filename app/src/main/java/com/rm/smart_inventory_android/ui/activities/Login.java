@@ -107,12 +107,14 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                         String userName = response.body().getData().get(0).getUser();
                         int id = response.body().getData().get(0).getId();
                         int idCount = response.body().getData().get(0).getIdCountAssigned();
+                        int userType = response.body().getData().get(0).getUserType();
 
                         Preferences.save(Login.this, "user", userName);
                         Preferences.save(Login.this, "password", password);
                         Preferences.save(Login.this, "token", token);
                         Preferences.save(Login.this, "user_id", String.valueOf(id));
                         Preferences.save(Login.this, "id_count_assigned", String.valueOf(idCount));
+                        Preferences.save(Login.this, "user_type", String.valueOf(userType));
 
                         Progress.dismissProgressDialog(Login.this);
 
