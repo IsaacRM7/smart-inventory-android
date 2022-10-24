@@ -8,65 +8,111 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="70dp"
         android:orientation="horizontal">
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.9"
-            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/txt_sku"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:textSize="19sp"
-                android:textStyle="bold" />
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:maxLines="5"
+                android:scrollHorizontally="false"
+                android:ellipsize="end"
+                android:textSize="16sp"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"/>
+
+            <View
+                android:id="@+id/view_sku_separator"
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:background="@color/lightblue" />
 
             <TextView
                 android:id="@+id/txt_sku_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:textSize="19sp"
-                android:textStyle="bold" />
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="3"
+                android:maxLines="5"
+                android:scrollHorizontally="false"
+                android:ellipsize="end"
+                android:textSize="16sp"
+                android:layout_marginStart="6dp"/>
+
+            <View
+                android:id="@+id/view_theoretical_separator"
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:background="@color/lightblue" />
 
             <TextView
                 android:id="@+id/txt_theoretical"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:text="@string/theoretical"
-                android:textSize="15sp" />
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.6"
+                android:maxLines="5"
+                android:scrollHorizontally="false"
+                android:ellipsize="end"
+                android:textSize="16sp"
+                android:layout_marginStart="6dp"/>
+
+            <View
+                android:id="@+id/view_physical_separator"
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:background="@color/lightblue" />
 
             <TextView
                 android:id="@+id/txt_physical"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:text="@string/physical"
-                android:textSize="15sp" />
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:maxLines="5"
+                android:scrollHorizontally="false"
+                android:ellipsize="end"
+                android:layout_weight="0.6"
+                android:textSize="16sp"
+                android:layout_marginStart="6dp"/>
+
+            <View
+                android:id="@+id/view_state_separator"
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:background="@color/lightblue" />
 
             <TextView
                 android:id="@+id/txt_difference"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
-                android:text="@string/difference"
-                android:textSize="15sp" />
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:maxLines="5"
+                android:scrollHorizontally="false"
+                android:ellipsize="end"
+                android:layout_weight="0.6"
+                android:textSize="16sp"
+                android:layout_marginStart="6dp"/>
 
-        </LinearLayout>
+            <View
+                android:id="@+id/view_last_separator"
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:background="@color/lightblue" />
 
-        <ImageView
-            android:id="@+id/image_circle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_circle"
-            android:layout_margin="7dp"
-            app:tint="@color/red"
-            android:contentDescription="@string/status" />
+            <ImageView
+                android:id="@+id/image_circle"
+                android:layout_width="25dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_circle"
+                app:tint="@color/red"
+                android:contentDescription="@string/status" />
 
     </LinearLayout>
 

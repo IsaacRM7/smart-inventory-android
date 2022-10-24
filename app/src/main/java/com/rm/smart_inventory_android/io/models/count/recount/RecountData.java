@@ -1,4 +1,4 @@
-package com.rm.smart_inventory_android.io.models.count;
+package com.rm.smart_inventory_android.io.models.count.recount;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;

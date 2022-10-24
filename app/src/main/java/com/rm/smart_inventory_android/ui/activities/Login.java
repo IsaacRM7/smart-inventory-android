@@ -8,9 +8,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputLayout;
+import com.rm.smart_inventory_android.BuildConfig;
 import com.rm.smart_inventory_android.R;
 import com.rm.smart_inventory_android.io.Preferences;
 import com.rm.smart_inventory_android.io.adapters.ApiRest;
@@ -36,6 +38,9 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        TextView txtVersion = findViewById(R.id.txt_version);
+        txtVersion.setText("Ver. "+BuildConfig.VERSION_NAME);
 
         Objects.requireNonNull(getSupportActionBar()).hide();
 

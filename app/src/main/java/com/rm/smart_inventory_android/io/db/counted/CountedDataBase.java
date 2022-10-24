@@ -8,7 +8,7 @@ import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
 import com.rm.smart_inventory_android.io.Converter;
-import com.rm.smart_inventory_android.io.models.count.RecountData;
+import com.rm.smart_inventory_android.io.models.count.recount.RecountData;
 
 @Database(entities = {RecountData.class}, version = 1, exportSchema = false)
 @TypeConverters({Converter.class})

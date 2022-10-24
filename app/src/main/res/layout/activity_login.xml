@@ -30,7 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/black"
-            android:text="admperu"
+            android:text="ruyalibat"
             android:singleLine="true"
             android:drawableStart="@drawable/ic_user" />
 
@@ -52,7 +52,7 @@
             android:id="@+id/txt_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="password"
+            android:text="admin"
             android:inputType="textPassword"
             android:textColor="@color/black"
             android:singleLine="true"
@@ -75,6 +75,8 @@
         android:id="@+id/txt_version"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
         android:textColor="@color/black"/>
 
 </LinearLayout>

@@ -1,13 +1,12 @@
 package com.rm.smart_inventory_android.io.adapters;
 
 import com.rm.smart_inventory_android.io.models.center.CenterRoot;
-import com.rm.smart_inventory_android.io.models.count.RecountData;
 import com.rm.smart_inventory_android.io.models.count.SendCountData;
+import com.rm.smart_inventory_android.io.models.count.recount.RecountRoot;
 import com.rm.smart_inventory_android.io.models.inventory.InventoryRoot;
 import com.rm.smart_inventory_android.io.models.login.UserRoot;
 import com.rm.smart_inventory_android.io.models.state.StateRoot;
 
-import java.util.List;
 import java.util.Map;
 
 import retrofit2.Call;
@@ -47,6 +46,6 @@ public interface Service {
     Call<SendCountData> sendCount(@Body Map<String, Object> params);
 
     @GET(wsCountedData)
-    Call<List<RecountData>> getCountedData(@Query("article_id") int id);
+    Call<RecountRoot> getCountedData(@Query("article_id") int id);
 
 }

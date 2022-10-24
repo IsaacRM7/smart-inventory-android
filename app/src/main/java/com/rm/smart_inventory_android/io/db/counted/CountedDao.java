@@ -6,8 +6,7 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
-import com.rm.smart_inventory_android.io.models.count.RecountData;
-import com.rm.smart_inventory_android.io.models.inventory.InventoryData;
+import com.rm.smart_inventory_android.io.models.count.recount.RecountData;
 
 import java.util.List;
 

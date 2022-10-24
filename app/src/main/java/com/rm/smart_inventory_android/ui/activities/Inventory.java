@@ -14,6 +14,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.navigation.NavigationView;
@@ -61,15 +63,25 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
         dbCenter = CenterDataBase.getInstance(Inventory.this);
         dbCounted = CountedDataBase.getInstance(Inventory.this);
 
-        LinearLayoutManager linearLayout = new LinearLayoutManager(this);
-
+        LinearLayoutManager linearLayout = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL,
+                false);
         RecyclerView recyclerView = findViewById(R.id.sku_recycler);
         inventoryAdapter = new InventoryAdapter(this, this);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(linearLayout);
         recyclerView.setAdapter(inventoryAdapter);
 
+        TextView txtTheoreticalTitle = findViewById(R.id.txt_theoretical_title);
+        TextView txtPhysicalTitle = findViewById(R.id.txt_physical_title);
+        TextView txtDifferenceTitle = findViewById(R.id.txt_difference_title);
+
         NavigationView navigationView = findViewById(R.id.navigation_view);
+
+        if(!Preferences.get(Inventory.this, "user_type").equals("1")){
+            txtDifferenceTitle.setVisibility(View.INVISIBLE);
+            txtTheoreticalTitle.setVisibility(View.INVISIBLE);
+            txtPhysicalTitle.setVisibility(View.INVISIBLE);
+        }
 
         if(this.getSupportActionBar() != null){
             ((AppCompatActivity) this ).getSupportActionBar().setDisplayHomeAsUpEnabled(true);

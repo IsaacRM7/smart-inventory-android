@@ -14,7 +14,9 @@ import android.os.Bundle;
 import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,8 +30,9 @@ import com.rm.smart_inventory_android.io.db.counted.CountedDataBase;
 import com.rm.smart_inventory_android.io.db.sendcount.SendCountDataBase;
 import com.rm.smart_inventory_android.io.db.sendcount.SendCountEntity;
 import com.rm.smart_inventory_android.io.models.count.CountData;
-import com.rm.smart_inventory_android.io.models.count.RecountData;
+import com.rm.smart_inventory_android.io.models.count.recount.RecountData;
 import com.rm.smart_inventory_android.io.models.count.SendCountData;
+import com.rm.smart_inventory_android.io.models.count.recount.RecountRoot;
 import com.rm.smart_inventory_android.ui.adapters.CountAdapter;
 import com.rm.smart_inventory_android.ui.adapters.CountedAdapter;
 import com.rm.smart_inventory_android.ui.dialogs.LocationDialog;
@@ -50,6 +53,7 @@ import retrofit2.Response;
 public class Count extends AppCompatActivity implements ClickListener {
 
     private RecyclerView recountRecyclerView;
+    private LinearLayout linearLayoutCounted;
     private TextView numbersBox;
     private String chain = "";
     private String operation="";
@@ -69,6 +73,10 @@ public class Count extends AppCompatActivity implements ClickListener {
     private CountAdapter countAdapter;
     private Intent intent;
     private TextView finalLocation;
+    private TextView txtTotalBoxes;
+    private TextView txtTotalUnits;
+    private TextView txtTotalWoodenPlatforms;
+    private TextView txtTotalPlasticPlatforms;
     private List<RecountData> recountDataList;
     private List<SendCountEntity> sendCountEntityList;
     private CountedAdapter countedAdapter;
@@ -89,6 +97,10 @@ public class Count extends AppCompatActivity implements ClickListener {
         TextView sku = findViewById(R.id.txt_sku_count);
         TextView skuName = findViewById(R.id.txt_sku_name_count);
         TextView skuFamily = findViewById(R.id.txt_family_count);
+        txtTotalBoxes = findViewById(R.id.txt_total_boxes);
+        txtTotalUnits = findViewById(R.id.txt_total_units);
+        txtTotalWoodenPlatforms = findViewById(R.id.txt_total_wooden_platforms);
+        txtTotalPlasticPlatforms = findViewById(R.id.txt_total_plastic_platforms);
         TextView location;
         Button b0 = findViewById(R.id.button0);
         Button b1 = findViewById(R.id.button1);
@@ -108,6 +120,7 @@ public class Count extends AppCompatActivity implements ClickListener {
         Button bTimes = findViewById(R.id.times_button);
         Button bDivide = findViewById(R.id.divide_button);
         FloatingActionButton fab = findViewById(R.id.send_data_fab);
+        linearLayoutCounted = findViewById(R.id.total_counted);
 
         numbersBox = findViewById(R.id.txt_numbers);
 
@@ -480,10 +493,10 @@ public class Count extends AppCompatActivity implements ClickListener {
         int id = intent.getIntExtra("skuId", 0);
         ApiRest.TOKEN = token;
 
-        Call<List<RecountData>> recountDataCall = service.getCountedData(id);
-        recountDataCall.enqueue(new Callback<List<RecountData>>() {
+        Call<RecountRoot> recountDataCall = service.getCountedData(id);
+        recountDataCall.enqueue(new Callback<RecountRoot>() {
             @Override
-            public void onResponse(@NonNull Call<List<RecountData>> call, @NonNull Response<List<RecountData>> response) {
+            public void onResponse(@NonNull Call<RecountRoot> call, @NonNull Response<RecountRoot> response) {
 
                 try{
                     if (response.isSuccessful()) {
@@ -501,26 +514,45 @@ public class Count extends AppCompatActivity implements ClickListener {
                         int status;
                         int id;
                         int articleId;
+                        int totalBoxes;
+                        int totalUnits;
+                        int totalWoodenPlatforms;
+                        int totalPlasticPlatforms;
 
                         if(response.body() != null){
-                            for(int i=0;i<response.body().size();i++){
-                                boxes = response.body().get(i).getBoxes();
-                                units = response.body().get(i).getUnits();
-                                plasticPlatforms = response.body().get(i).getPlasticPlatforms();
-                                woodenPlatforms = response.body().get(i).getWoodenPlatforms();
-                                date = response.body().get(i).getDate();
-                                user = response.body().get(i).getUser();
-                                status = response.body().get(i).getStatus();
-                                id = response.body().get(i).getId();
-                                statusName = response.body().get(i).getStatusName();
-                                conversionToBoxes = response.body().get(i).getConversionToBoxes();
-                                conversionToUnits = response.body().get(i).getConversionToUnits();
-                                locationResponse = response.body().get(i).getLocation();
-                                levelResponse = response.body().get(i).getLevel();
-                                articleId = response.body().get(i).getArticleId();
+                            totalBoxes = response.body().getBoxes();
+                            totalUnits = response.body().getUnits();
+                            totalWoodenPlatforms = response.body().getWoodenPlatforms();
+                            totalPlasticPlatforms = response.body().getPlasticPlatforms();
+                            for(int i=0;i<response.body().getData().size();i++){
+                                boxes = response.body().getData().get(i).getBoxes();
+                                units = response.body().getData().get(i).getUnits();
+                                plasticPlatforms = response.body().getData().get(i).getPlasticPlatforms();
+                                woodenPlatforms = response.body().getData().get(i).getWoodenPlatforms();
+                                date = response.body().getData().get(i).getDate();
+                                user = response.body().getData().get(i).getUser();
+                                status = response.body().getData().get(i).getStatus();
+                                id = response.body().getData().get(i).getId();
+                                statusName = response.body().getData().get(i).getStatusName();
+                                conversionToBoxes = response.body().getData().get(i).getConversionToBoxes();
+                                conversionToUnits = response.body().getData().get(i).getConversionToUnits();
+                                locationResponse = response.body().getData().get(i).getLocation();
+                                levelResponse = response.body().getData().get(i).getLevel();
+                                articleId = response.body().getData().get(i).getArticleId();
 
                                 recountDataList.add(new RecountData(id, articleId, user, boxes, units, woodenPlatforms, plasticPlatforms, levelResponse, status, statusName, conversionToBoxes, conversionToUnits, locationResponse, date));
                             }
+                            txtTotalBoxes.setText("Cajas: "+totalBoxes);
+                            txtTotalUnits.setText("Unidades: "+totalUnits);
+                            txtTotalWoodenPlatforms.setText("Tarimas Madera: "+totalWoodenPlatforms);
+                            txtTotalPlasticPlatforms.setText("Tarimas Plasticas: "+totalPlasticPlatforms);
+
+                            linearLayoutCounted.setVisibility(View.VISIBLE);
+
+                            txtTotalBoxes.setVisibility(View.VISIBLE);
+                            txtTotalUnits.setVisibility(View.VISIBLE);
+                            txtTotalWoodenPlatforms.setVisibility(View.VISIBLE);
+                            txtTotalPlasticPlatforms.setVisibility(View.VISIBLE);
 
                             dbCounted.countedDao().insertList(recountDataList);
 
@@ -534,7 +566,7 @@ public class Count extends AppCompatActivity implements ClickListener {
             }
 
             @Override
-            public void onFailure(@NonNull Call<List<RecountData>> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<RecountRoot> call, @NonNull Throwable t) {
                 t.getLocalizedMessage();
                 try{
                     countedAdapter = new CountedAdapter(Count.this, dbCounted.countedDao().findCountedList(Integer.parseInt(String.valueOf(intent.getIntExtra("skuId", 0)))));

@@ -123,9 +123,12 @@ public class Center extends AppCompatActivity {
                         centerRecyclerview.setAdapter(centerAdapter);
                         Progress.dismissProgressBar();
                     }
+                    else{
+                        Toast.makeText(Center.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
                 }catch (Exception ex){
                     Progress.dismissProgressBar();
-                    Toast.makeText(Center.this, "Ocurrió un error", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Center.this, "Ocurrió un error al cargar los centros", Toast.LENGTH_SHORT).show();
 
                     ex.getLocalizedMessage();
                 }

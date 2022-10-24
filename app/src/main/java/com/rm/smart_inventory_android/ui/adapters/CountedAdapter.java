@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.rm.smart_inventory_android.R;
 import com.rm.smart_inventory_android.io.Preferences;
-import com.rm.smart_inventory_android.io.models.count.RecountData;
+import com.rm.smart_inventory_android.io.models.count.recount.RecountData;
 
 import java.util.List;
 

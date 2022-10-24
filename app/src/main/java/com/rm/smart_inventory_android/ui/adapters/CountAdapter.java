@@ -41,7 +41,6 @@ public class CountAdapter extends RecyclerView.Adapter<CountAdapter.ViewHolder> 
         CountData countData = countDataList.get(position);
         holder.measure.setText(countData.getMeasure());
         holder.amount.setText(String.valueOf(countData.getAmount()));
-        holder.currentAmount.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -58,7 +57,6 @@ public class CountAdapter extends RecyclerView.Adapter<CountAdapter.ViewHolder> 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView measure;
         private TextView amount;
-        private TextView currentAmount;
         private ClickListener listener;
 
         public ViewHolder(@NonNull View itemView, ClickListener listener) {
@@ -66,7 +64,6 @@ public class CountAdapter extends RecyclerView.Adapter<CountAdapter.ViewHolder> 
 
             measure = itemView.findViewById(R.id.txt_measure);
             amount = itemView.findViewById(R.id.txt_amount);
-            currentAmount = itemView.findViewById(R.id.txt_current_amount);
             this.listener = listener;
 
             itemView.setOnClickListener(this);
