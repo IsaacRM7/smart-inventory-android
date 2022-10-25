@@ -52,6 +52,9 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
     private SendCountDataBase dbSendCount;
     private CenterDataBase dbCenter;
     private CountedDataBase dbCounted;
+    private String resumeText = "";
+    RecyclerView recyclerView;
+    private SearchView searchView;
 
     @SuppressLint("NonConstantResourceId")
     @Override
@@ -65,7 +68,7 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
 
         LinearLayoutManager linearLayout = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL,
                 false);
-        RecyclerView recyclerView = findViewById(R.id.sku_recycler);
+        recyclerView = findViewById(R.id.sku_recycler);
         inventoryAdapter = new InventoryAdapter(this, this);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(linearLayout);
@@ -87,7 +90,7 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
             ((AppCompatActivity) this ).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        SearchView searchView = findViewById(R.id.searchview);
+        searchView = findViewById(R.id.searchview);
         searchView.setOnQueryTextListener(this);
         searchView.setQueryHint("Buscar SKU");
 
@@ -263,6 +266,7 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
 
                             dbInventory.inventoryDao().insertList(inventoryDataList);
                             inventoryAdapter.addList((ArrayList<InventoryData>) dbInventory.inventoryDao().getAll());
+                            recyclerView.setAdapter(inventoryAdapter);
                         }
                         else{
                             Toast.makeText(Inventory.this, inventoryRoot.getMessage(), Toast.LENGTH_SHORT).show();
@@ -277,6 +281,7 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
             @Override
             public void onFailure(@NonNull Call<InventoryRoot> call, @NonNull Throwable t) {
                 Progress.dismissProgressBar();
+                if(dbInventory.inventoryDao().getAll().size()>0)
                 inventoryAdapter.addList((ArrayList<InventoryData>) dbInventory.inventoryDao().getAll());
             }
         });
@@ -297,7 +302,7 @@ public class Inventory extends AppCompatActivity implements ClickListener, Searc
         String token = Preferences.get(Inventory.this, "token");
         ApiRest.TOKEN = token;
 
-        if(dbSendCount.countedDao().getAll().size() != 0){
+        if(dbSendCount.countedDao().getAll().size() <= 0){
             for(int i=0;i<dbSendCount.countedDao().getAll().size(); i++){
                 params.put("article_id", dbSendCount.countedDao().getAll().get(i).getArticleId());
                 params.put("counted_article_id", dbSendCount.countedDao().getAll().get(i).getCountedArticleId());

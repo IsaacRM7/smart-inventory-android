@@ -142,7 +142,7 @@ public class Count extends AppCompatActivity implements ClickListener {
         getAmountList();
 
         if(this.getSupportActionBar() != null){
-            Objects.requireNonNull(((AppCompatActivity) this).getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+            Objects.requireNonNull(this.getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         }
 
         b0.setOnClickListener(v -> {
